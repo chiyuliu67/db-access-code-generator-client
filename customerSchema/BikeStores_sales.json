@@ -1,0 +1,232 @@
+[
+	{
+		"tableName": "customers",
+		"columns": [
+			{
+				"name": "customer_id",
+				"dataType": "int",
+				"nullable": "NO",
+				"key": "TRUE",
+				"length": "100"
+			},
+			{
+				"name": "first_name",
+				"dataType": "varchar",
+				"nullable": "NO"
+			},
+			{
+				"name": "last_name",
+				"dataType": "varchar",
+				"nullable": "NO"
+			},
+			{
+				"name": "phone",
+				"dataType": "varchar",
+				"nullable": "YES"
+			},
+			{
+				"name": "email",
+				"dataType": "varchar",
+				"nullable": "NO"
+			},
+			{
+				"name": "street",
+				"dataType": "varchar",
+				"nullable": "YES"
+			},
+			{
+				"name": "city",
+				"dataType": "varchar",
+				"nullable": "YES"
+			},
+			{
+				"name": "state",
+				"dataType": "varchar",
+				"nullable": "YES"
+			},
+			{
+				"name": "zip_code",
+				"dataType": "varchar",
+				"nullable": "YES"
+			}
+		]
+	},
+	{
+		"tableName": "order_items",
+		"columns": [
+			{
+				"name": "order_id",
+				"dataType": "int",
+				"nullable": "NO",
+				"key": "TRUE",
+				"length": "100"
+			},
+			{
+				"name": "item_id",
+				"dataType": "int",
+				"nullable": "NO"
+			},
+			{
+				"name": "product_id",
+				"dataType": "int",
+				"nullable": "NO"
+			},
+			{
+				"name": "quantity",
+				"dataType": "int",
+				"nullable": "NO"
+			},
+			{
+				"name": "list_price",
+				"dataType": "decimal",
+				"nullable": "NO"
+			},
+			{
+				"name": "discount",
+				"dataType": "decimal",
+				"nullable": "NO"
+			}
+		]
+	},
+	{
+		"tableName": "orders",
+		"columns": [
+			{
+				"name": "order_id",
+				"dataType": "int",
+				"nullable": "NO",
+				"key": "TRUE",
+				"length": "100"
+			},
+			{
+				"name": "customer_id",
+				"dataType": "int",
+				"nullable": "YES"
+			},
+			{
+				"name": "order_status",
+				"dataType": "tinyint",
+				"nullable": "NO"
+			},
+			{
+				"name": "order_date",
+				"dataType": "date",
+				"nullable": "NO"
+			},
+			{
+				"name": "required_date",
+				"dataType": "date",
+				"nullable": "NO"
+			},
+			{
+				"name": "shipped_date",
+				"dataType": "date",
+				"nullable": "YES"
+			},
+			{
+				"name": "store_id",
+				"dataType": "int",
+				"nullable": "NO"
+			},
+			{
+				"name": "staff_id",
+				"dataType": "int",
+				"nullable": "NO"
+			}
+		]
+	},
+	{
+		"tableName": "staffs",
+		"columns": [
+			{
+				"name": "staff_id",
+				"dataType": "int",
+				"nullable": "NO",
+				"key": "TRUE",
+				"length": "100"
+			},
+			{
+				"name": "first_name",
+				"dataType": "varchar",
+				"nullable": "NO"
+			},
+			{
+				"name": "last_name",
+				"dataType": "varchar",
+				"nullable": "NO"
+			},
+			{
+				"name": "email",
+				"dataType": "varchar",
+				"nullable": "NO"
+			},
+			{
+				"name": "phone",
+				"dataType": "varchar",
+				"nullable": "YES"
+			},
+			{
+				"name": "active",
+				"dataType": "tinyint",
+				"nullable": "NO"
+			},
+			{
+				"name": "store_id",
+				"dataType": "int",
+				"nullable": "NO"
+			},
+			{
+				"name": "manager_id",
+				"dataType": "int",
+				"nullable": "YES"
+			}
+		]
+	},
+	{
+		"tableName": "stores",
+		"columns": [
+			{
+				"name": "store_id",
+				"dataType": "int",
+				"nullable": "NO",
+				"key": "TRUE",
+				"length": "100"
+			},
+			{
+				"name": "store_name",
+				"dataType": "varchar",
+				"nullable": "NO"
+			},
+			{
+				"name": "phone",
+				"dataType": "varchar",
+				"nullable": "YES"
+			},
+			{
+				"name": "email",
+				"dataType": "varchar",
+				"nullable": "YES"
+			},
+			{
+				"name": "street",
+				"dataType": "varchar",
+				"nullable": "YES"
+			},
+			{
+				"name": "city",
+				"dataType": "varchar",
+				"nullable": "YES"
+			},
+			{
+				"name": "state",
+				"dataType": "varchar",
+				"nullable": "YES"
+			},
+			{
+				"name": "zip_code",
+				"dataType": "varchar",
+				"nullable": "YES"
+			}
+		]
+	}
+]

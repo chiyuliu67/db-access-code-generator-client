@@ -1,0 +1,67 @@
+codeGenService:
+  host: 'localhost'
+  port: '8082'
+filename:
+  baseDir: '/Users/chiyu/AnypointStudio/prototype/db-access-code-generator-client'
+  output:
+    base: 'generated'
+schemaConnection:
+  default:
+    newApp:
+      odata:
+        defaultPageSize: '52'
+      gql:
+        maxQueryDepthAllowed: '9'
+        maxQueryComplexityAllowed: '101'
+        httpRequestResponseTimeout: '15001'
+        introspectionEnabled: 'false'
+  ex_mssql:
+    newApp:
+      odata:
+        appPort: '8081'
+        apiVersion: '1'
+      gql:
+        appPort: '9092'
+        apiVersion: '1'
+    is4SFDC: 'true'
+    dbtype: 'mssql'
+    tablenames: 'production.brands, production.categories, production.products, production.stocks, sales.customers, sales.order_items, sales.orders, sales.staffs, sales.stores'
+    host: 'local-vm-rocky'
+    port: '1433'
+    username: 'sa'
+    password: '![rowZ8nB7SxP1mSSAXtLK3Q==]'
+    databaseName: 'BikeStores'
+  ex_oracle:
+    newApp:
+      odata:
+        appPort: '6061'
+        apiVersion: '1'
+      gql:
+        appPort: '7072'
+        apiVersion: '1'
+    is4SFDC: 'false'
+    dbtype: 'oracle'
+    schemaname: 'ARMS'
+    tablenames: 'CONTACTS, COUNTRIES, CUSTOMERS, EMPLOYEES, INVENTORIES, LOCATIONS, ORDER_ITEMS, ORDERS, PRODUCT_CATEGORIES, PRODUCTS, REGIONS, WAREHOUSES'
+    host: 'local-vm-rocky'
+    port: '1521'
+    username: 'arms'
+    password: '![rowZ8nB7SxP1mSSAXtLK3Q==]'
+    serviceName: 'NNLPDB1'
+  ex_mysql:
+    newApp:
+      odata:
+        appPort: '4041'
+        apiVersion: '1'
+      gql:
+        appPort: '5052'
+        apiVersion: '1'
+    is4SFDC: 'true'
+    dbtype: 'mysql'
+    schemaname: 'ARMS'
+    tablenames: 'CONTACTS, COUNTRIES, CUSTOMERS, EMPLOYEES, INVENTORIES, LOCATIONS, ORDER_ITEMS, ORDERS, PRODUCT_CATEGORIES, PRODUCTS, REGIONS, WAREHOUSES, SALES'
+    host: 'local-vm-rocky'
+    port: '3306'
+    username: 'root'
+    password: '![rowZ8nB7SxP1mSSAXtLK3Q==]'
+    database: 'ARMS'

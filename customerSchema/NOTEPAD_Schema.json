@@ -1,0 +1,283 @@
+{
+	"tableName": "DATA_HUB_V",
+	"columns": [
+		{
+			"name": "pid",
+			"dataType": "int(10,0)",
+			"nullable": "NO",
+			"key": "TRUE"
+		},
+		{
+			"name": "status",
+			"dataType": "varchar(1)",
+			"nullable": "NO",
+			"length": "1"
+		},
+		{
+			"name": "user_ID",
+			"dataType": "varchar(8)",
+			"nullable": "YES",
+			"length": "8"
+		},
+		{
+			"name": "last_name",
+			"dataType": "varchar(64)",
+			"nullable": "NO",
+			"length": "64"
+		},
+		{
+			"name": "first_name",
+			"dataType": "varchar(64)",
+			"nullable": "NO",
+			"length": "64"
+		},
+		{
+			"name": "middle_initial",
+			"dataType": "varchar(1)",
+			"nullable": "YES",
+			"length": "1"
+		},
+		{
+			"name": "middle_name",
+			"dataType": "varchar(32)",
+			"nullable": "YES",
+			"length": "32"
+		},
+		{
+			"name": "initials",
+			"dataType": "varchar(2)",
+			"nullable": "NO",
+			"length": "2"
+		},
+		{
+			"name": "name_prefix",
+			"dataType": "varchar(32)",
+			"nullable": "YES",
+			"length": "32"
+		},
+		{
+			"name": "name_suffix",
+			"dataType": "varchar(8)",
+			"nullable": "YES",
+			"length": "8"
+		},
+		{
+			"name": "office_phone",
+			"dataType": "varchar(64)",
+			"nullable": "YES",
+			"length": "64"
+		},
+		{
+			"name": "fax_phone",
+			"dataType": "int(10,0)",
+			"nullable": "YES"
+		},
+		{
+			"name": "mobile_phone",
+			"dataType": "varchar(64)",
+			"nullable": "YES",
+			"length": "64"
+		},
+		{
+			"name": "mgr_user_id",
+			"dataType": "varchar(8)",
+			"nullable": "YES",
+			"length": "8"
+		},
+		{
+			"name": "site",
+			"dataType": "varchar(max)",
+			"nullable": "YES"
+		},
+		{
+			"name": "physical_site",
+			"dataType": "varchar(40)",
+			"nullable": "NO",
+			"length": "40"
+		},
+		{
+			"name": "physical_site_abbr",
+			"dataType": "varchar(3)",
+			"nullable": "YES",
+			"length": "3"
+		},
+		{
+			"name": "reporting_organization_site",
+			"dataType": "varchar(4)",
+			"nullable": "NO",
+			"length": "4"
+		},
+		{
+			"name": "company",
+			"dataType": "varchar(7)",
+			"nullable": "NO",
+			"length": "7"
+		},
+		{
+			"name": "organization",
+			"dataType": "varchar(max)",
+			"nullable": "YES"
+		},
+		{
+			"name": "top_level_org",
+			"dataType": "varchar(150)",
+			"nullable": "YES",
+			"length": "150"
+		},
+		{
+			"name": "top_level_org_abbr",
+			"dataType": "varchar(100)",
+			"nullable": "YES",
+			"length": "100"
+		},
+		{
+			"name": "top_level_org_code",
+			"dataType": "varchar(5)",
+			"nullable": "NO",
+			"length": "5"
+		},
+		{
+			"name": "first_level_org",
+			"dataType": "varchar(150)",
+			"nullable": "YES",
+			"length": "150"
+		},
+		{
+			"name": "first_level_org_abbr",
+			"dataType": "varchar(100)",
+			"nullable": "YES",
+			"length": "100"
+		},
+		{
+			"name": "first_level_org_code",
+			"dataType": "varchar(31)",
+			"nullable": "YES",
+			"length": "31"
+		},
+		{
+			"name": "office_number",
+			"dataType": "varchar(270)",
+			"nullable": "NO",
+			"length": "270"
+		},
+		{
+			"name": "building",
+			"dataType": "varchar(1)",
+			"nullable": "NO",
+			"length": "1"
+		},
+		{
+			"name": "email_address",
+			"dataType": "varchar(17)",
+			"nullable": "YES",
+			"length": "17"
+		},
+		{
+			"name": "unclassified_email_address",
+			"dataType": "varchar(1)",
+			"nullable": "NO",
+			"length": "1"
+		},
+		{
+			"name": "job_descr",
+			"dataType": "nvarchar(max)",
+			"nullable": "YES"
+		},
+		{
+			"name": "can_code",
+			"dataType": "varchar(1)",
+			"nullable": "NO",
+			"length": "1"
+		},
+		{
+			"name": "emp_type",
+			"dataType": "varchar(1)",
+			"nullable": "NO",
+			"length": "1"
+		},
+		{
+			"name": "reporting_level",
+			"dataType": "int(10,0)",
+			"nullable": "YES"
+		},
+		{
+			"name": "signature_level",
+			"dataType": "int(10,0)",
+			"nullable": "YES"
+		},
+		{
+			"name": "schedule",
+			"dataType": "int(10,0)",
+			"nullable": "YES"
+		},
+		{
+			"name": "mgr_badge_id",
+			"dataType": "int(10,0)",
+			"nullable": "YES"
+		},
+		{
+			"name": "mgr_first_name",
+			"dataType": "varchar(64)",
+			"nullable": "YES",
+			"length": "64"
+		},
+		{
+			"name": "mgr_middle_name",
+			"dataType": "varchar(32)",
+			"nullable": "YES",
+			"length": "32"
+		},
+		{
+			"name": "mgr_last_name",
+			"dataType": "varchar(64)",
+			"nullable": "YES",
+			"length": "64"
+		},
+		{
+			"name": "ADC",
+			"dataType": "varchar(1)",
+			"nullable": "NO",
+			"length": "1"
+		},
+		{
+			"name": "ADC_LAN",
+			"dataType": "varchar(1)",
+			"nullable": "NO",
+			"length": "1"
+		},
+		{
+			"name": "Mail",
+			"dataType": "varchar(1)",
+			"nullable": "NO",
+			"length": "1"
+		},
+		{
+			"name": "preferred_first_name",
+			"dataType": "varchar(64)",
+			"nullable": "YES",
+			"length": "64"
+		},
+		{
+			"name": "location_code",
+			"dataType": "varchar(4)",
+			"nullable": "YES",
+			"length": "4"
+		},
+		{
+			"name": "plant_code",
+			"dataType": "int(10,0)",
+			"nullable": "YES"
+		},
+		{
+			"name": "last_update_date",
+			"dataType": "datetime",
+			"nullable": "YES"
+		},
+		{
+			"name": "user_person_type",
+			"dataType": "varchar(26)",
+			"nullable": "NO",
+			"length": "26"
+		}
+	]
+}

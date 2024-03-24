@@ -1,0 +1,8 @@
+{
+  "minMuleVersion": "4.4.0",
+  "secureProperties": [
+  	"secureKey",
+  	"logging.splunkToken",
+  	"anypoint.platform.client_secret"
+  ]
+}

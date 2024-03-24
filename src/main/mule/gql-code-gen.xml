@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd">
+	<flow name="gql-code-genFlow" doc:id="0c8e6f57-3753-4dc8-b586-2085723a8171" >
+		<http:listener doc:name="Listener" doc:id="7e9a2ab6-4dd4-4368-950e-714695a4a231" config-ref="HTTP_Listener_config" path="/schemaCodeGen/gql/{schemaConnection}"/>
+		<ee:transform doc:name="Prepare Variables" doc:id="6e608cd1-fbae-4405-a5b5-3c01bbecf6f0" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="filename" ><![CDATA[%dw 2.0
+import * from dw::util::Coercions
+output application/java
+var schema = attributes.uriParams.schemaConnection
+var inBaseDir = p( 'filename.output.base' ) ++ "/" ++ schema ++ "/"
+var outBaseDir = p( 'filename.output.base' ) ++ "/" ++ schema ++ "/GraphQL/"
+---
+{
+	'in': {
+		schemaJson: inBaseDir ++ "schemaInfo/" ++ schema ++ "_schema.json",
+		navRefJson: inBaseDir ++ "schemaInfo/" ++ schema ++ "_NavigationReference.json",
+		gqlImplTemplate: p( 'filename.template.GraphQL.gqlImplTemplate' ),
+		gqlImplGlobalConfigTemplate: p( 'filename.template.GraphQL.gqlImplGlobalConfigTemplate' ),
+		gqlListenerImplTemplate: p( 'filename.template.GraphQL.gqlListenerImplTemplate' ),
+		gqlReverseExpandImplTemplate: p( 'filename.template.GraphQL.gqlReverseExpandImplTemplate' ),
+		gqlDWLUtil: p( 'filename.template.GraphQL.gqlDWLUtil' ),
+		gqlPropertiesTemplate: p( 'filename.template.GraphQL.gqlPropertiesTemplate' ),
+		gqlPostmanIntrospectionTemplate: p( 'filename.template.GraphQL.gqlPostmanIntrospectionTemplate' ),
+		gqlPostmanTemplate: p( 'filename.template.GraphQL.gqlPostmanTemplate' ),
+		gqlPOMDependencies: p( 'filename.template.GraphQL.gqlPOMDependencies' ),
+		gqlSuggestedLog4JLoggers: p( 'filename.template.GraphQL.gqlSuggestedLog4JLoggers' )
+	},
+	'out': {
+		dir: outBaseDir,
+		gqlDWLUtilDir: outBaseDir ++ "dw4gql/",
+		gqlSchema: outBaseDir ++ "/api/" ++ schema ++ ".graphql",
+		gqlImpl: outBaseDir ++ schema ++ "_GraphQL" ++ ".xml",
+		gqlImplGlobalConfig: outBaseDir ++ schema ++ "_global.xml",
+		gqlProperties: outBaseDir ++ "dev-properties.yaml",
+		gqlPostman: outBaseDir ++ schema ++ "_gqlPostman.txt"
+	}
+}]]></ee:set-variable>
+				<ee:set-variable variableName="schema" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.uriParams.schemaConnection]]></ee:set-variable>
+				<ee:set-variable variableName="dbtype" ><![CDATA[%dw 2.0
+output application/java
+---
+p( 'schemaConnection.' ++ attributes.uriParams.schemaConnection ++ '.dbtype' )]]></ee:set-variable>
+				<ee:set-variable variableName="schemaConnectionName" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.uriParams.schemaConnection]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<file:write doc:name="Write properties" doc:id="c2e654f1-4b55-44bf-ab8f-7a312d733f9d" config-ref="File_Config" path="#[vars.filename.out.gqlProperties]">
+			<file:content><![CDATA[#[%dw 2.0
+import config_schemaConnection_newApp from dwUtils::newAppConfig
+output text/plain
+var propertyConfig = 
+"##schemaConnectionName:
+  gql:
+    definitionFile: 'api/##schemaConnectionName.graphql'
+    maxQueryDepthAllowed: '##maxQueryDepthAllowed'
+    maxQueryComplexityAllowed: '##maxQueryComplexityAllowed'
+    httpRequestResponseTimeout: '##httpRequestResponseTimeout'
+    introspectionEnabled: '##introspectionEnabled'
+    http:
+      listener:
+        host: '0.0.0.0'
+        port: '##newGQLAppPort'
+        path: 'gql/##schemaConnectionName/v##gqlApiVersion'
+  odataApi:
+    http:
+      request:
+        host: 'localhost'
+        port: '##newOdataAppPort'
+        basePath: '/odata/##schemaConnectionName/v##odataApiVersion'
+"
+---
+propertyConfig replace '##schemaConnectionName' with vars.schemaConnectionName
+replace '##newOdataAppPort' with ( config_schemaConnection_newApp( p, vars.schema, ".odata.appPort", "8881" ) )
+replace '##odataApiVersion' with ( config_schemaConnection_newApp( p, vars.schema, ".odata.apiVersion", "11" ) )
+replace '##newGQLAppPort' with ( config_schemaConnection_newApp( p, vars.schema, ".gql.appPort", "9992" ) )
+replace '##gqlApiVersion' with ( config_schemaConnection_newApp( p, vars.schema, ".gql.apiVersion", "11" ) )
+replace '##maxQueryDepthAllowed' with ( config_schemaConnection_newApp( p, vars.schema, ".gql.maxQueryDepthAllowed", "7" ) )
+replace '##maxQueryComplexityAllowed' with ( config_schemaConnection_newApp( p, vars.schema, ".gql.maxQueryComplexityAllowed", "110" ) )
+replace '##httpRequestResponseTimeout' with ( config_schemaConnection_newApp( p, vars.schema, ".gql.httpRequestResponseTimeout", "15500" ) )
+replace '##introspectionEnabled' with ( config_schemaConnection_newApp( p, vars.schema, ".gql.introspectionEnabled", "false" ) )]]]></file:content>
+		</file:write>
+		<file:read doc:name="Load schemaInfo" doc:id="e94729e8-0c3c-48a0-8f87-b5dfeae6e350" config-ref="File_Config" path="#[vars.filename.in.schemaJson]" outputMimeType="application/json" target="schemaInfo"/>
+		<file:read doc:name="Load navRef" doc:id="a55a0d0e-a956-40a9-8d81-a1a473b03e52" config-ref="File_Config" path="#[vars.filename.in.navRefJson]" outputMimeType="application/json" target="fkInfo" />
+		<http:request method="POST" doc:name="Request" doc:id="62808598-54e5-45b2-9721-dc697d2c1174" path='#["/schemaCodeGen/gql/" ++ vars.schema]' config-ref="HTTP_Request_configuration" responseTimeout="60000" target="zippedFileList" outputMimeType="application/json">
+			<http:body ><![CDATA[#[%dw 2.0
+import config_schemaConnection_newApp from dwUtils::newAppConfig
+import * from dw::util::Coercions
+output application/json
+---
+{
+	newApp: {
+		odata: {
+			apiVersion: ( config_schemaConnection_newApp( p, vars.schema, ".odata.apiVersion", "11" ) ),
+			appPort: config_schemaConnection_newApp( p, vars.schema, ".odata.appPort", "8881" )
+		},
+		gql: {
+			apiVersion: ( config_schemaConnection_newApp( p, vars.schema, ".gql.apiVersion", "11" ) ),
+			appPort: config_schemaConnection_newApp( p, vars.schema, ".gql.appPort", "9992" )
+		}
+	},
+	schemaInfo: vars.schemaInfo,
+	fkInfo: vars.fkInfo,
+	schemaConnectionProperties: { dbtype: p( 'schemaConnection.' ++ vars.schema ++ '.dbtype' ) }
+}]]]></http:body>
+		</http:request>
+		<compression:decompress doc:name="Decompress" doc:id="c7704856-3197-4afb-bddf-6d2a48f7f50b" outputMimeType="application/json" target="fileList">
+			<compression:compressed><![CDATA[#[%dw 2.0
+output application/octet-stream
+import fromBase64 from dw::core::Binaries
+---
+fromBase64( vars.zippedFileList.zipped )]]]></compression:compressed>
+			<compression:decompressor>
+				<compression:zip-decompressor />
+			</compression:decompressor>
+		</compression:decompress>
+		<foreach doc:name="For Each" doc:id="9bbca6cb-aad8-40ae-9799-54a4f1318ea6" collection="#[vars.fileList]" >
+			<file:write doc:name="Write" doc:id="be0d43d0-bfb4-458c-bd46-f5c6c50e5cab" config-ref="File_Config" path="#[vars.filename.out.dir ++ payload.outputFile]" >
+				<file:content ><![CDATA[#[write( payload.fileContent, "text/plain" )]]]></file:content>
+			</file:write>
+		</foreach>
+		<ee:transform doc:name="Transform Message" doc:id="30db8026-3b6a-437f-9ff3-43cfacff1c6f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import config_schemaConnection_newApp from dwUtils::newAppConfig
+import usage from dwUtils::generateGraphQL_usage
+output application/json
+---
+{ 
+	OutputFiles: ( ( vars.fileList map( e, i ) -> ( e.outputFile replace "\\" with "/" ) ) << "dev-perperties.yaml" ) orderBy $,
+	Usage: usage map( e, i ) -> e 
+			replace '<db-access-code-generator>/' with vars.filename.out.dir
+			replace '<schemaConnectionName>' with vars.schema
+			replace '<newOdataAppPort>' with ( config_schemaConnection_newApp( p, vars.schema, ".odata.appPort", "8881" ) )
+			replace '<newGQLAppPort>' with ( config_schemaConnection_newApp( p, vars.schema, ".gql.appPort", "9992" ) )
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+</flow>
+</mule>

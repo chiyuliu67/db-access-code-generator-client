@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd">
+	<flow name="odata-code-genFlow" doc:id="87f849d2-14f2-4cc3-ab7f-027fe4dfb843" >
+		<http:listener doc:name="Listener" doc:id="9eb8628d-b776-4be3-9bc1-6fc2244cd243" config-ref="HTTP_Listener_config" path="/schemaCodeGen/odata/{schemaConnection}"/>
+				<ee:transform doc:name="Prepare Variables" doc:id="92be114e-2136-4a10-99dd-8926e6588517">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="filename"><![CDATA[%dw 2.0
+import * from dw::util::Coercions
+output application/java
+var schema = attributes.uriParams.schemaConnection
+var dbtype = p( 'schemaConnection.' ++ schema ++ '.dbtype' )
+var outBaseDir = p( 'filename.output.base' ) ++ "/" ++ schema ++ "/OData/"
+---
+{
+	'in': {
+		schemaJson: p( 'filename.output.base' ) ++ "/" ++ schema ++ "/schemaInfo/" ++ schema ++ "_schema.json",
+		navRefJson: p( 'filename.output.base' ) ++ "/" ++ schema ++ "/schemaInfo/" ++ schema ++ "_NavigationReference.json"
+	},
+	'out': {
+		dir: outBaseDir
+	}
+}]]></ee:set-variable>
+				<ee:set-variable variableName="schema"><![CDATA[%dw 2.0
+output application/java
+---
+attributes.uriParams.schemaConnection]]></ee:set-variable>
+				<ee:set-variable variableName="dbtype"><![CDATA[%dw 2.0
+output application/java
+---
+p( 'schemaConnection.' ++ attributes.uriParams.schemaConnection ++ '.dbtype' )]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="generate_requiredProperties" doc:id="5481d898-065b-4c37-8c17-1830ed5cd8e2" name='#["odata.writeProperty." ++ vars.dbtype]'/>
+		<file:write doc:name="Write properties" doc:id="fd907191-cfd3-4a7d-97d9-8a2e1fca0fc8" config-ref="File_Config" path='#[vars.filename.out.dir ++ "dev-properties.yaml"]'>
+			<file:content><![CDATA[#[vars.properties]]]></file:content>
+
+		</file:write>
+		<file:read doc:name="Read schemaInfo" doc:id="6777769d-06a1-475e-afb7-103150c2ac26" config-ref="File_Config" path="#[vars.filename.in.schemaJson]" target="schemaInfo" outputMimeType="application/json"/>
+		<file:read doc:name="Read navigationReference" doc:id="8c4bdd14-d1d1-4e1e-b51e-5a296e2a4dd1" config-ref="File_Config" path="#[vars.filename.in.navRefJson]" target="fkInfo" outputMimeType="application/json"/>
+		<http:request method="POST" doc:name="Request" doc:id="c70dc344-66b6-4d99-947a-052c0ec60e80" path='#["/schemaCodeGen/odata/" ++ vars.schema]' config-ref="HTTP_Request_configuration" responseTimeout="60000" target="zippedFileList" outputMimeType="application/json">
+			<http:body ><![CDATA[#[%dw 2.0
+import config_schemaConnection_newApp from dwUtils::newAppConfig
+import * from dw::util::Coercions
+output application/json
+---
+{
+	newApp: {
+		odata: {
+			apiVersion: ( config_schemaConnection_newApp( p, vars.schema, ".odata.apiVersion", "11" ) ),
+			appPort: config_schemaConnection_newApp( p, vars.schema, ".odata.appPort", "8881" )
+		}
+	},
+	schemaInfo: vars.schemaInfo,
+	fkInfo: vars.fkInfo,
+	schemaConnectionProperties: { is4SFDC: toBoolean( p( 'schemaConnection.' ++ vars.schema ++ '.is4SFDC' ) ), dbtype: p( 'schemaConnection.' ++ vars.schema ++ '.dbtype' ) }
+}]]]></http:body>
+		</http:request>
+		<compression:decompress doc:name="Decompress" doc:id="21cf97f0-2f2d-445b-a55c-98ac78d6f3cb" target="fileList" outputMimeType="application/json">
+			<compression:compressed ><![CDATA[#[%dw 2.0
+output application/octet-stream
+import fromBase64 from dw::core::Binaries
+---
+fromBase64( vars.zippedFileList.zipped )]]]></compression:compressed>
+			<compression:decompressor >
+				<compression:zip-decompressor />
+			</compression:decompressor>
+		</compression:decompress>
+		<foreach doc:name="For Each" doc:id="c786454e-d451-4b01-8bda-c4c682f1d856" collection="#[vars.fileList]">
+			<file:write doc:name="Write" doc:id="0850cc15-8a5c-4c05-8ba1-c1ebfc10e32d" path="#[vars.filename.out.dir ++ payload.outputFile]" config-ref="File_Config">
+				<file:content ><![CDATA[#[write( payload.fileContent, "text/plain" )]]]></file:content>
+			</file:write>
+		</foreach>
+		<ee:transform doc:name="Transform Message" doc:id="6fff378d-d401-42aa-8da4-847b4074a96b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import config_schemaConnection_newApp from dwUtils::newAppConfig
+import usage from dwUtils::generateOdata4_usage
+output application/json
+---
+{ 
+	OutputFiles: ( ( vars.fileList map( e, i ) -> ( e.outputFile replace "\\" with "/" ) ) << "dev-perperties.yaml" ) orderBy $,
+//	dir: vars.filename.out.dir,
+//	schema: vars.schema,
+	Usage: usage map( e, i ) -> e 
+			replace '<db-access-code-generator>/' with vars.filename.out.dir
+			replace '<schemaConnectionName>' with vars.schema
+			replace '<newOdataAppPort>' with ( config_schemaConnection_newApp( p, vars.schema, ".odata.appPort", "8881" ) )
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	
+</flow>
+	<sub-flow name="odata.writeProperty.oracle" doc:id="9b385ad1-bbf5-4014-b5a9-3e4fada2b5e3" >
+		<set-variable value="#[%dw 2.0&#10;import config_schemaConnection_newApp from dwUtils::newAppConfig&#10;output text/plain&#10;var propertyConfig = &#10;&quot;app:&#10;  port: '##newOdataAppPort'&#10;  path: '/odata/##schemaConnection/v##odataApiVersion/*'&#10;schemaConnection:&#10;  ##schemaConnection:&#10;    host: '##host'&#10;    port: '##port'&#10;    username: '##username'&#10;    password: '##password'&#10;    serviceName: '##serviceName'&#10;odata:&#10;  defaultPageSize: '##defaultPageSize'&#10;&quot;&#10;---&#10;( propertyConfig &#10;	replace '##schemaConnection' with vars.schema&#10;	replace '##newOdataAppPort' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.appPort&quot;, &quot;8881&quot; ) )&#10;	replace '##defaultPageSize' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.defaultPageSize&quot;, &quot;55&quot; ) )&#10;	replace '##odataApiVersion' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.apiVersion&quot;, &quot;11&quot; ) )&#10;	replace '##host' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.host&quot; )&#10;	replace '##port' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.port&quot; )&#10;	replace '##username' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.username&quot; )&#10;	replace '##password' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.password&quot; )&#10;	replace '##serviceName' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.serviceName&quot; )&#10;)]" doc:name="Set Variable properties" doc:id="d0b15c0b-ede4-4d72-89cd-c7cb490fcc99" variableName="properties"/>
+	
+
+</sub-flow>
+	<sub-flow name="odata.writeProperty.mssql" doc:id="aec9ed13-b3f7-444c-b925-11e97dbf2f9d" >
+		<set-variable value="#[%dw 2.0&#10;import config_schemaConnection_newApp from dwUtils::newAppConfig&#10;output text/plain&#10;var splitTableSchema = ( e ) -&gt; e splitBy &quot;.&quot;&#10;var tableSchemaProperty = ( e ) -&gt; &quot;    &quot; ++ e[ 1 ] ++ &quot;: '&quot; ++ e[ 0 ] ++ &quot;'\n&quot;&#10;var propertyConfig = &#10;&quot;app:&#10;  port: '##newOdataAppPort'&#10;  path: '/odata/##schemaConnection/v##odataApiVersion/*'&#10;schemaConnection:&#10;  ##schemaConnection:&#10;    host: '##host'&#10;    port: '##port'&#10;    username: '##username'&#10;    password: '##password'&#10;    databaseName: '##databaseName'&#10;odata:&#10;  defaultPageSize: '##defaultPageSize'&#10;  schemaName:&#10;&quot;&#10;---&#10;( propertyConfig &#10;	replace '##schemaConnection' with vars.schema&#10;	replace '##newOdataAppPort' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.appPort&quot;, &quot;8881&quot; ) )&#10;	replace '##defaultPageSize' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.defaultPageSize&quot;, &quot;50&quot; ) )&#10;	replace '##odataApiVersion' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.apiVersion&quot;, &quot;11&quot; ) )&#10;	replace '##host' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.host&quot; )&#10;	replace '##port' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.port&quot; )&#10;	replace '##username' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.username&quot; )&#10;	replace '##password' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.password&quot; )&#10;	replace '##databaseName' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.databaseName&quot; )&#10;) ++ &#10;( ( p( &quot;schemaConnection.&quot; ++ vars.schema ++ &quot;.tablenames&quot; ) splitBy /,/ ) &#10;	reduce( e, a = &quot;&quot; ) -&gt; a ++ tableSchemaProperty( splitTableSchema( trim( e ) ) )&#10;)]" doc:name="Set Variable properties" doc:id="99040781-690a-440c-90b3-a1dd7c988d57" variableName="properties"/>
+	
+
+</sub-flow>
+	<sub-flow name="odata.writeProperty.mysql" doc:id="5b992ea1-1625-429f-aa42-7bed20d3a021">
+		<set-variable value="#[%dw 2.0&#10;import config_schemaConnection_newApp from dwUtils::newAppConfig&#10;output text/plain&#10;var propertyConfig = &#10;&quot;app:&#10;  port: '##newOdataAppPort'&#10;  path: '/odata/##schemaConnection/v##odataApiVersion/*'&#10;schemaConnection:&#10;  ##schemaConnection:&#10;    host: '##host'&#10;    port: '##port'&#10;    username: '##username'&#10;    password: '##password'&#10;    database: '##database'&#10;odata:&#10;  defaultPageSize: '##defaultPageSize'&#10;&quot;&#10;---&#10;( propertyConfig &#10;	replace '##schemaConnection' with vars.schema&#10;	replace '##newOdataAppPort' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.appPort&quot;, &quot;8881&quot; ) )&#10;	replace '##odataApiVersion' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.apiVersion&quot;, &quot;11&quot; ) )&#10;	replace '##defaultPageSize' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.defaultPageSize&quot;, &quot;50&quot; ) )&#10;	replace '##host' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.host&quot; )&#10;	replace '##port' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.port&quot; )&#10;	replace '##username' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.username&quot; )&#10;	replace '##password' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.password&quot; )&#10;	replace '##database' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.database&quot; )&#10;)]" doc:name="Set Variable properties" doc:id="aad65880-f6a6-496e-bd42-32b1d7a49c55" variableName="properties"/>
+	
+
+</sub-flow>
+</mule>

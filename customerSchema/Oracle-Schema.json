@@ -1,0 +1,369 @@
+[
+	{
+		"tableName": "CUSTOMERS",
+		"columns": [
+			{
+				"name": "CUSTOMER_ID",
+				"dataType": "NUMBER",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "NAME",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "255"
+			},
+			{
+				"name": "ADDRESS",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "Yes",
+				"length": "255"
+			},
+			{
+				"name": "WEBSITE",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "Yes",
+				"length": "255"
+			},
+			{
+				"name": "CREDIT_LIMIT",
+				"dataType": "NUMBER(8,2)",
+				"nullable": "Yes"
+			}
+		]
+	},
+	{
+		"tableName": "COUNTRIES",
+		"columns": [
+			{
+				"name": "COUNTRY_ID",
+				"dataType": "CHAR(2 BYTE)",
+				"nullable": "No",
+				"key": "TRUE",
+				"length": "2"
+			},
+			{
+				"name": "COUNTRY_NAME",
+				"dataType": "VARCHAR2(40 BYTE)",
+				"nullable": "No",
+				"length": "40"
+			},
+			{
+				"name": "REGION_ID",
+				"dataType": "NUMBER",
+				"nullable": "Yes"
+			}
+		]
+	},
+	{
+		"tableName": "CONTACTS",
+		"columns": [
+			{
+				"name": "CONTACT_ID",
+				"dataType": "NUMBER",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "FIRST_NAME",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "255"
+			},
+			{
+				"name": "LAST_NAME",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "255"
+			},
+			{
+				"name": "EMAIL",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "255"
+			},
+			{
+				"name": "PHONE",
+				"dataType": "VARCHAR2(20 BYTE)",
+				"nullable": "Yes",
+				"length": "20"
+			},
+			{
+				"name": "CUSTOMER_ID",
+				"dataType": "NUMBER",
+				"nullable": "Yes"
+			}
+		]
+	},
+	{
+		"tableName": "EMPLOYEES",
+		"columns": [
+			{
+				"name": "EMPLOYEE_ID",
+				"dataType": "NUMBER",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "FIRST_NAME",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "255"
+			},
+			{
+				"name": "LAST_NAME",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "255"
+			},
+			{
+				"name": "EMAIL",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "255"
+			},
+			{
+				"name": "PHONE",
+				"dataType": "VARCHAR2(50 BYTE)",
+				"nullable": "No",
+				"length": "50"
+			},
+			{
+				"name": "HIRE_DATE",
+				"dataType": "DATE",
+				"nullable": "No"
+			},
+			{
+				"name": "MANAGER_ID",
+				"dataType": "NUMBER(12,0)",
+				"nullable": "Yes"
+			},
+			{
+				"name": "JOB_TITLE",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "155"
+			}
+		]
+	},
+	{
+		"tableName": "LOCATIONS",
+		"columns": [
+			{
+				"name": "LOCATION_ID",
+				"dataType": "NUMBER",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "ADDRESS",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "255"
+			},
+			{
+				"name": "POSTAL_CODE",
+				"dataType": "VARCHAR2(20 BYTE)",
+				"nullable": "Yes",
+				"length": "20"
+			},
+			{
+				"name": "CITY",
+				"dataType": "VARCHAR2(50 BYTE)",
+				"nullable": "Yes",
+				"length": "50"
+			},
+			{
+				"name": "STATE",
+				"dataType": "VARCHAR2(50 BYTE)",
+				"nullable": "Yes",
+				"length": "50"
+			},
+			{
+				"name": "COUNTRY_ID",
+				"dataType": "CHAR(2 BYTE)",
+				"nullable": "Yes",
+				"length": "2"
+			}
+		]
+	},
+	{
+		"tableName": "INVENTORIES",
+		"columns": [
+			{
+				"name": "PRODUCT_ID",
+				"dataType": "NUMBER(12,0)",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "WAREHOUSE_ID",
+				"dataType": "NUMBER(12,0)",
+				"nullable": "No"
+			},
+			{
+				"name": "QUANTITY",
+				"dataType": "NUMBER(8,0)",
+				"nullable": "No"
+			}
+		]
+	},
+	{
+		"tableName": "ORDER_ITEMS",
+		"columns": [
+			{
+				"name": "ORDER_ID",
+				"dataType": "NUMBER(12,0)",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "ITEM_ID",
+				"dataType": "NUMBER(12,0)",
+				"nullable": "No"
+			},
+			{
+				"name": "PRODUCT_ID",
+				"dataType": "NUMBER(12,0)",
+				"nullable": "No"
+			},
+			{
+				"name": "QUANTITY",
+				"dataType": "NUMBER(8,2)",
+				"nullable": "No"
+			},
+			{
+				"name": "UNIT_PRICE",
+				"dataType": "NUMBER(8,2)",
+				"nullable": "No"
+			}
+		]
+	},
+	{
+		"tableName": "ORDERS",
+		"columns": [
+			{
+				"name": "ORDER_ID",
+				"dataType": "NUMBER",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "CUSTOMER_ID",
+				"dataType": "NUMBER(6,0)",
+				"nullable": "No"
+			},
+			{
+				"name": "STATUS",
+				"dataType": "VARCHAR2(20 BYTE)",
+				"nullable": "No",
+				"length": "20"
+			},
+			{
+				"name": "SALESMAN_ID",
+				"dataType": "NUMBER(6,0)",
+				"nullable": "Yes"
+			},
+			{
+				"name": "ORDER_DATE",
+				"dataType": "DATE",
+				"nullable": "No"
+			}
+		]
+	},
+	{
+		"tableName": "PRODUCT_CATEGORIES",
+		"columns": [
+			{
+				"name": "CATEGORY_ID",
+				"dataType": "NUMBER",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "CATEGORY_NAME",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "255"
+			}
+		]
+	},
+	{
+		"tableName": "PRODUCTS",
+		"columns": [
+			{
+				"name": "PRODUCT_ID",
+				"dataType": "NUMBER",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "PRODUCT_NAME",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "No",
+				"length": "255"
+			},
+			{
+				"name": "DESCRIPTION",
+				"dataType": "VARCHAR2(2000 BYTE)",
+				"nullable": "Yes",
+				"length": "2000"
+			},
+			{
+				"name": "STANDARD_COST",
+				"dataType": "NUMBER(9,2)",
+				"nullable": "Yes"
+			},
+			{
+				"name": "LIST_PRICE",
+				"dataType": "NUMBER(9,2)",
+				"nullable": "Yes"
+			},
+			{
+				"name": "CATEGORY_ID",
+				"dataType": "NUMBER",
+				"nullable": "No"
+			}
+		]
+	},
+	{
+		"tableName": "REGIONS",
+		"columns": [
+			{
+				"name": "REGION_ID",
+				"dataType": "NUMBER",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "REGION_NAME",
+				"dataType": "VARCHAR2(50 BYTE)",
+				"nullable": "No",
+				"length": "50"
+			}
+		]
+	},
+	{
+		"tableName": "WAREHOUSES",
+		"columns": [
+			{
+				"name": "WAREHOUSE_ID",
+				"dataType": "NUMBER",
+				"nullable": "No",
+				"key": "TRUE"
+			},
+			{
+				"name": "WAREHOUSE_NAME",
+				"dataType": "VARCHAR2(255 BYTE)",
+				"nullable": "Yes",
+				"length": "255"
+			},
+			{
+				"name": "LOCATION_ID",
+				"dataType": "NUMBER(12,0)",
+				"nullable": "Yes"
+			}
+		]
+	}
+]
