@@ -1,8 +1,13 @@
+applicationName: 'db-access-code-generator-client'
 codeGenService:
-  host: 'localhost'
-  port: '8082'
+  host2: 'localhost'
+  port2: '8082'
+  host: 'dev-db-access-code-generator-services.us-e2.cloudhub.io'
+  port: '443'
 filename:
   baseDir: '/Users/chiyu/AnypointStudio/prototype/db-access-code-generator-client'
+  input:
+    postmanCollection: 'EMPTY.postman_collection.json'
   output:
     base: 'generated'
 schemaConnection:

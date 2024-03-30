@@ -44,9 +44,10 @@ p( 'schemaConnection.' ++ attributes.uriParams.schemaConnection ++ '.dbtype' )]]
 			<file:content><![CDATA[#[vars.properties]]]></file:content>
 
 		</file:write>
+		<file:read doc:name="Read emptyPostmanCollection" doc:id="ff94816b-fd59-43a5-8963-56d5446938bc" path="${mule.home}/apps/${applicationName}/${filename.input.postmanCollection}" outputMimeType="application/json" target="emptyPostmanCollection" />
 		<file:read doc:name="Read schemaInfo" doc:id="6777769d-06a1-475e-afb7-103150c2ac26" config-ref="File_Config" path="#[vars.filename.in.schemaJson]" target="schemaInfo" outputMimeType="application/json"/>
 		<file:read doc:name="Read navigationReference" doc:id="8c4bdd14-d1d1-4e1e-b51e-5a296e2a4dd1" config-ref="File_Config" path="#[vars.filename.in.navRefJson]" target="fkInfo" outputMimeType="application/json"/>
-		<http:request method="POST" doc:name="Request" doc:id="c70dc344-66b6-4d99-947a-052c0ec60e80" path='#["/schemaCodeGen/odata/" ++ vars.schema]' config-ref="HTTP_Request_configuration" responseTimeout="60000" target="zippedFileList" outputMimeType="application/json">
+		<http:request method="POST" doc:name="Request" doc:id="c70dc344-66b6-4d99-947a-052c0ec60e80" path='#["/schemaCodeGen/odata"]' config-ref="HTTP_Request_configuration" responseTimeout="60000" target="zippedFileList" outputMimeType="application/json">
 			<http:body ><![CDATA[#[%dw 2.0
 import config_schemaConnection_newApp from dwUtils::newAppConfig
 import * from dw::util::Coercions
@@ -59,9 +60,11 @@ output application/json
 			appPort: config_schemaConnection_newApp( p, vars.schema, ".odata.appPort", "8881" )
 		}
 	},
+	schema: vars.schema,
 	schemaInfo: vars.schemaInfo,
 	fkInfo: vars.fkInfo,
-	schemaConnectionProperties: { is4SFDC: toBoolean( p( 'schemaConnection.' ++ vars.schema ++ '.is4SFDC' ) ), dbtype: p( 'schemaConnection.' ++ vars.schema ++ '.dbtype' ) }
+	schemaConnectionProperties: { is4SFDC: toBoolean( p( 'schemaConnection.' ++ vars.schema ++ '.is4SFDC' ) ), dbtype: p( 'schemaConnection.' ++ vars.schema ++ '.dbtype' ) },
+	emptyPostmanCollection: vars.emptyPostmanCollection
 }]]]></http:body>
 		</http:request>
 		<compression:decompress doc:name="Decompress" doc:id="21cf97f0-2f2d-445b-a55c-98ac78d6f3cb" target="fileList" outputMimeType="application/json">

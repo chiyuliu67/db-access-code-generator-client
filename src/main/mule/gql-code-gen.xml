@@ -94,9 +94,10 @@ replace '##maxQueryComplexityAllowed' with ( config_schemaConnection_newApp( p, 
 replace '##httpRequestResponseTimeout' with ( config_schemaConnection_newApp( p, vars.schema, ".gql.httpRequestResponseTimeout", "15500" ) )
 replace '##introspectionEnabled' with ( config_schemaConnection_newApp( p, vars.schema, ".gql.introspectionEnabled", "false" ) )]]]></file:content>
 		</file:write>
+		<file:read doc:name="Read emptyPostmanCollection" doc:id="e7775865-4562-4c94-bd8f-d0cc55946914" path="${mule.home}/apps/${applicationName}/${filename.input.postmanCollection}" outputMimeType="application/json" target="emptyPostmanCollection" />
 		<file:read doc:name="Load schemaInfo" doc:id="e94729e8-0c3c-48a0-8f87-b5dfeae6e350" config-ref="File_Config" path="#[vars.filename.in.schemaJson]" outputMimeType="application/json" target="schemaInfo"/>
 		<file:read doc:name="Load navRef" doc:id="a55a0d0e-a956-40a9-8d81-a1a473b03e52" config-ref="File_Config" path="#[vars.filename.in.navRefJson]" outputMimeType="application/json" target="fkInfo" />
-		<http:request method="POST" doc:name="Request" doc:id="62808598-54e5-45b2-9721-dc697d2c1174" path='#["/schemaCodeGen/gql/" ++ vars.schema]' config-ref="HTTP_Request_configuration" responseTimeout="60000" target="zippedFileList" outputMimeType="application/json">
+		<http:request method="POST" doc:name="Request" doc:id="62808598-54e5-45b2-9721-dc697d2c1174" path='#["/schemaCodeGen/gql"]' config-ref="HTTP_Request_configuration" responseTimeout="60000" target="zippedFileList" outputMimeType="application/json">
 			<http:body ><![CDATA[#[%dw 2.0
 import config_schemaConnection_newApp from dwUtils::newAppConfig
 import * from dw::util::Coercions
@@ -113,9 +114,11 @@ output application/json
 			appPort: config_schemaConnection_newApp( p, vars.schema, ".gql.appPort", "9992" )
 		}
 	},
+	schema: vars.schema,
 	schemaInfo: vars.schemaInfo,
 	fkInfo: vars.fkInfo,
-	schemaConnectionProperties: { dbtype: p( 'schemaConnection.' ++ vars.schema ++ '.dbtype' ) }
+	schemaConnectionProperties: { dbtype: p( 'schemaConnection.' ++ vars.schema ++ '.dbtype' ) },
+	emptyPostmanCollection: vars.emptyPostmanCollection
 }]]]></http:body>
 		</http:request>
 		<compression:decompress doc:name="Decompress" doc:id="c7704856-3197-4afb-bddf-6d2a48f7f50b" outputMimeType="application/json" target="fileList">
@@ -150,5 +153,6 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+
 </flow>
 </mule>
