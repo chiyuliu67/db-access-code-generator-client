@@ -17,6 +17,13 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="93165de1-544e-4465-91de-69398e3fe07b" >
 		<http:listener-connection host="0.0.0.0" port="8888" />
 	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="92c0ecf1-1266-4947-b6ec-fe75aff9f612" >
+		<http:request-connection host="${codeGenService.host}" port="${codeGenService.port}" connectionIdleTimeout="60000" protocol="HTTPS">
+			<tls:context >
+				<tls:trust-store insecure="true" />
+			</tls:context>
+		</http:request-connection>
+	</http:request-config>
 	<file:config name="File_Config" doc:name="File Config" doc:id="4f867406-ba0b-4747-ab35-d50134a03949" >
 		<file:connection workingDir="${filename.baseDir}" />
 	</file:config>
@@ -29,22 +36,14 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 	<db:config name="Database_Config_EX_MySql" doc:name="Database Config" doc:id="615087fc-c3b3-4b0a-84e9-139804c02e74" >
 		<db:my-sql-connection host="${schemaConnection.ex_mysql.host}" port="${schemaConnection.ex_mysql.port}" user="${schemaConnection.ex_mysql.username}" password="${secure::schemaConnection.ex_mysql.password}" database="${schemaConnection.ex_mysql.database}"/>
 	</db:config>
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="c7eacaeb-633a-4a18-a37f-630de852b349" >
-		<http:request-connection host="${codeGenService.host}" port="${codeGenService.port}" connectionIdleTimeout="60000" protocol="HTTPS">
-			<tls:context >
-				<tls:trust-store insecure="true" />
-			</tls:context>
-		</http:request-connection>
-	</http:request-config>
 	<flow name="Schema-InfoFlow" doc:id="a17038c1-0154-4850-96d7-1b6d6b181f11" >
 		<http:listener doc:name="Listener" doc:id="4d6913db-ed36-431e-b014-e620f8e48fb2" config-ref="HTTP_Listener_config" path="/schemaInfo/{schemaConnection}"/>
-		<set-variable value="#[%dw 2.0&#10;import * from dw4OdataUtil::codeGenerator::sql_schemainfo&#10;output application/java&#10;var propertyRoot = 'schemaConnection.' ++ attributes.uriParams.schemaConnection ++ &quot;.&quot;&#10;---&#10;{&#10;	connection: attributes.uriParams.schemaConnection,&#10;	dbtype: p( propertyRoot ++ &quot;dbtype&quot; ),&#10;	schemaName: p( propertyRoot ++ &quot;schemaname&quot; ),&#10;	configuredTableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) -&gt; trim( e ),&#10;	tableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) &#10;		-&gt; trim( if ( e contains( &quot;.&quot; ) ) ( e splitBy( &quot;.&quot; ) )[ 1 ] else e ),&#10;	schemaQuery: schemaQuery[ p( propertyRoot ++ &quot;dbtype&quot; ) as String ],&#10;	fkQuery: fkQuery[ p( propertyRoot ++ &quot;dbtype&quot; ) as String ]&#10;}]" doc:name="Set request" doc:id="9b2b58b2-7957-4dd5-9c29-b9a3d58cf3ce" variableName="request" />
-		<set-variable value="#[[]]" doc:name="Initialize Variable dbSchemaInfo" doc:id="152d0e2c-19ac-40af-bafc-51412c7fc274" variableName="dbSchemaInfo"/>
+		<set-variable value="#[%dw 2.0&#10;import * from dw4OdataUtil::codeGenerator::sql_schemainfo&#10;output application/java&#10;var propertyRoot = 'schemaConnection.' ++ attributes.uriParams.schemaConnection ++ &quot;.&quot;&#10;---&#10;{&#10;	connection: attributes.uriParams.schemaConnection,&#10;	dbtype: p( propertyRoot ++ &quot;dbtype&quot; ),&#10;	schemaName: p( propertyRoot ++ &quot;schemaname&quot; ),&#10;	configuredTableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) -&gt; trim( e ),&#10;	tableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) &#10;		-&gt; trim( if ( e contains( &quot;.&quot; ) ) ( e splitBy( &quot;.&quot; ) )[ 1 ] else e ),&#10;	schemaQuery: schemaQuery[ p( propertyRoot ++ &quot;dbtype&quot; ) as String ],&#10;	fkQuery: fkQuery[ p( propertyRoot ++ &quot;dbtype&quot; ) as String ]&#10;}]" doc:name="Set Variable request" doc:id="9b2b58b2-7957-4dd5-9c29-b9a3d58cf3ce" variableName="request" />
 		<foreach doc:name="For Each vars.request.configuredTableNames" doc:id="479296eb-8b19-402d-bc13-cfc866bcfebd" collection="#[vars.request.configuredTableNames]" >
-			<set-variable value='#[if ( payload contains( "." ) )&#10;	{&#10;		schemaName: ( payload splitBy( "." ) )[ 0 ],&#10;		tableName: ( payload splitBy( "." ) )[ 1 ]&#10;	}&#10;else&#10;	{&#10;		schemaName: vars.request.schemaName,&#10;		tableName: payload&#10;	}]' doc:name="Set tablePointer" doc:id="982c37ea-e01b-46ef-a7b4-499c4b7b49bd" variableName="tablePointer" />
+			<set-variable value='#[if ( payload contains( "." ) )&#10;	{&#10;		schemaName: ( payload splitBy( "." ) )[ 0 ],&#10;		tableName: ( payload splitBy( "." ) )[ 1 ]&#10;	}&#10;else&#10;	{&#10;		schemaName: vars.request.schemaName,&#10;		tableName: payload&#10;	}]' doc:name="Set Variable tablePointer" doc:id="982c37ea-e01b-46ef-a7b4-499c4b7b49bd" variableName="tablePointer" />
 			<flow-ref doc:name="getSchema" doc:id="cc38d7fd-5ae8-4347-b81d-2e0d5b389c1f" name='#["getSchema." ++ vars.request.connection]' />
-			<set-variable value="#[vars.fkInfo map( e, i ) -&gt; ( ( e pluck( v, k, j ) -&gt; { ( lower( k ) ): v } ) reduce( vv, a = {} ) -&gt; a ++ vv )]" doc:name="Set Variable" doc:id="8c32dfb9-6efa-41ed-ae78-14a01c3880d4" variableName="fkInfo"/>
-			<set-variable doc:name="Set Variable dbSchemaInfo" doc:id="46f62b6e-5d3b-478f-9481-d92e01a052a5" variableName="dbSchemaInfo" value="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.dbSchemaInfo &lt;&lt;&#10;(&#10;	vars.tablePointer ++ 	&#10;	{&#10;		fkInfo: vars.fkInfo,&#10;		schemaInfo: payload&#10;	}&#10;)]"/>
+			<set-variable value="#[vars.fkInfo map( e, i ) -&gt; &#10;	( e mapObject( v, k, j ) -&gt; &#10;		{ ( lower( k ) ): v }&#10;	)]" doc:name="Set Variable fkInfo" doc:id="8c32dfb9-6efa-41ed-ae78-14a01c3880d4" variableName="fkInfo"/>
+			<set-variable doc:name="Set Variable dbSchemaInfo" doc:id="46f62b6e-5d3b-478f-9481-d92e01a052a5" variableName="dbSchemaInfo" value="#[%dw 2.0&#10;output application/json&#10;---&#10;( vars.dbSchemaInfo default [] ) &lt;&lt;&#10;(&#10;	vars.tablePointer ++ 	&#10;	{&#10;		fkInfo: vars.fkInfo,&#10;		schemaInfo: payload&#10;	}&#10;)]"/>
 		</foreach>
 		<http:request method="POST" doc:name="Request" doc:id="77315069-9ef7-4adc-b1b5-fe391b1e58e2" config-ref="HTTP_Request_configuration" path='#["/schemaInfo"]'>
 			<http:body ><![CDATA[#[output application/json
