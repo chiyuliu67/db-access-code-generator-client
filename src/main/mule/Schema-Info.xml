@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-	xmlns:file="http://www.mulesoft.org/schema/mule/file"
-	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+<mule xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
-http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd">
 	<configuration-properties doc:name="Configuration properties" doc:id="45c83007-51b2-49d7-8c52-9682fe158a6e" file="${env}-properties.yaml" />
 	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="7554af2a-fcf7-43b5-9a3b-c42aaaa2f6d1" file="${env}-properties.yaml" key="${secureKey}" >
 	</secure-properties:config>
@@ -59,26 +60,11 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 	dbSchemaInfo: vars.dbSchemaInfo
 }]]]></http:body>
 		</http:request>
-		<file:write doc:name="Write Schema Json file" doc:id="559b8f3c-4d82-47d3-9670-0d8eb62c27c4" config-ref="File_Config" path="#[p( 'filename.output.base' ) ++ &quot;/&quot; ++ vars.request.connection ++ &quot;/schemaInfo/&quot; ++ vars.request.connection ++ &quot;_schema.json&quot;]">
-			<file:content><![CDATA[#[%dw 2.0
-output application/json
----
-payload.schemaInfo]]]></file:content>
-		</file:write>
-		<file:write doc:name="Write NavigationReference file" doc:id="2be62a76-2f27-4031-a461-8a893db34b87" config-ref="File_Config" path="#[p( 'filename.output.base' ) ++ &quot;/&quot; ++ vars.request.connection ++ &quot;/schemaInfo/&quot; ++ vars.request.connection ++ &quot;_NavigationReference.json&quot;]">
-			<file:content><![CDATA[#[%dw 2.0
-output application/json
----
-vars.request.tableNames reduce( e, a={} ) -> a ++
-    {
-        ( e ): 
-            if ( ( payload.NavigationReference pluck( v, k, i ) -> ( k as String ) ) contains e ) 
-            ( payload.NavigationReference[ e ] )
-            else {
-                "navigationProperties": []
-            }
-    }]]]></file:content>
-		</file:write>
+		<foreach doc:name="For Each" doc:id="651b1b15-715d-49b5-a7d5-2d140860b9df" collection="#[payload.fileList]">
+			<file:write doc:name="Write" doc:id="a66549ab-dd03-4af0-845a-97e8002df783" config-ref="File_Config" path="#[write( p( 'filename.output.base' ) ++ &quot;/&quot; ++ vars.request.connection ++ &quot;/schemaInfo/&quot; ++ payload.outputFile, &quot;text/plain&quot; )]">
+				<file:content><![CDATA[#[write( payload.fileContent, "text/plain" )]]]></file:content>
+			</file:write>
+		</foreach>
 		<ee:transform doc:name="Prepare return tablesWithKeyColumnIssue" doc:id="8150187f-6207-47fc-9025-3cda5c5ae0d0">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
