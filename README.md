@@ -56,11 +56,10 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
         - **"default.newApp.gql"**
           > **appPort:** the default listening port the new **_GraphQL application_** will be listening on
           > **apiVersion:** the API version number the new **_GraphQL application_** is providing
-          > **defaultPageSize:** the default page size for the new **_GraphQL application_**
-          > **maxQueryDepthAllowed:** the maximum depth a query can have. The value must be greater than 1.
-          > **maxQueryComplexityAllowed:** the maximum number of data fields a query can include. The value must be greater than 1.
+          > **defaultPageSize:** the default page size for the new **_GraphQL application_** > **[maxQueryDepthAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum depth a query can have. The value must be greater than 1.
+          > **[maxQueryComplexityAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum number of data fields a query can include. The value must be greater than 1.
           > **httpRequestResponseTimeout:** the HTTP timeout value when querying from the OData layer
-          > **introspectionEnabled:** enables schema introspection (recommand to set it to "false" for Production environment by default)
+          > **[introspectionEnabled](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#parameters):** enables schema introspection (recommand to set it to "false" for Production environment by default)
 
       - **"\<schemaConnectionName>"**
 
@@ -132,7 +131,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
     > This file describes the relationships among tables. It contains both the foreign key lookup relationship defined for each table, and the reversed foreign key lookup from other partner tables.
 
-  - **"_keyColumnCount\_\_\<N>\_\<tableName>_\_noContent.txt\_"**
+  - **"_WARNING/keyColumnCount\_\_\<N>\_\<tableName>_\_noContent.txt\_"**
 
     > This type of files has empty content and is trying to use its filename to notify the users that there exists tables of which the key column count is not exactly 1. If the key column count is 0, then it must be fixed before start generating the implementation code because currently this code generator program only supports tables with a single key column.
 
