@@ -4,26 +4,34 @@
 
 ## Overview
 
-#### _OData_
+This is the client side of the overall Code Generator project which users will work with locally.
 
-This project is to help developers to generate the **_OData_** and Graph implementation code to work with the MuleSoft **_OData_** and **_GraphQL_** module.
+It will connect to users' databases to retrieve the schema information of tables specified by the user and their relationships according to the foreign key defined, and then request the **_OData_** and **_Graph_** asset generation from the server side of the project which is hosted on CloudHub.
+
+The assets it generates are the **_OData_** and **_Graph_** API definition and implementation code, based on MuleSoft **_OData API Kit_** and **_GraphQL API Kit_** module, to provide the **_OData_** and **_Graph_** interface for the databases (currently supporting Oracle, MySql, and Sql Server), plus the Postaman collection which can be used to test the generated implementation.
+
+To use this tool, download this MuleSoft project and import it into your MuleSoft Studio, add your custom database connection information to its property configuration, add (by copy/paste) the database connector configuration and the corresponding operation, then execute the project in any Mule Runtime (Studio, CloudHub, on-premise) that can communicate with the databases.
+
+The generated code supports the following:
+
+#### _OData_
 
 The current generated **_OData_** code supports **_"MsSql"_**, **_"Oracle"_**, and **_"MySql"_** with the following **_REST_** operation:
 
-- **_GET COLLECTION_** (support **_\$top_**, **_$\skip_**, **_\$orderby_**, **_\$select_**, **_\$count_**, **_\$filter_**, and **_\$expand_**)
+- **_GET COLLECTION_** (support **_\$top_**, **_\$skip_**, **_\$orderby_**, **_\$select_**, **_\$count_**, **_\$filter_**, **_\$expand_**, and **_nested \$expand_**)
 - **_POST COLLECTION_** (though it is accepting one record at a time, it is catagorized to COLLECTION because it doesn't take the ENTITY ID as the URI Param)
 - **_GET ENTITY_** (support **_\$select_** and **_\$expand_**)
 - **_PATCH ENTITY_**
 - **_PUT ENTITY_**
 - **_DELETE ENTITY_**
 
-Currently the code-generator directly supports tables with a single primary key. For tables with 0 or more than 1 keys to work with this code generator, it requires to be either fixed in the database or manually change the generated schemaInfo file before continuing and also manually update the generated **_OData_** code to support the use case.
+The database tables primary key, either single primary key or composite keys, must be defined. For tables with no primary key defined, it requires to be either fixed in the database or manually change the generated schemaInfo file before continuing.
 
-For the primary key column which is "auto-generated" in MsSql, the required "POST" and "PUT" code is also generated but commented out by default. The "auto-generated" primary key column for Oracle and MySql hasn't been looked into yet.
+This tool currently support the MSSql tables with "auto-generated" primary key column. However, the "auto-generated" primary key in Oracle and MySql are not supported yet.
 
 #### _GraphQL_
 
-Currently this tool only generates Query code for **_GraphQL_**, and the generated **_GraphQL_** code is built on top of the **_OData_** implementation.
+Currently this tool only generates code to support **_GraphQL Query_** but not **_GraphQL Mutation_**, and the generated **_GraphQL_** code is built on top of the **_OData_** implementation.
 
 ## Usage
 
@@ -37,11 +45,28 @@ Currently this tool only generates Query code for **_GraphQL_**, and the generat
 
     - **_"schemaConnection"_**
 
+      - **"default.newApp"**
+
+        > This set of configuration items will be used to provide the default configuration for the new **_OData application_** and the new **_GraphQL application_** users are creating. Each of the values can be overridden at the specific **"\<schemaConnectionName>"** level.
+
+        - **"default.newApp.odata."**
+          > **appPort:** the default listening port the new **_OData application_** will be listening on
+          > **apiVersion:** the API version number the new **_OData application_** is providing
+          > **defaultPageSize:** the default page size for the new **_OData application_**
+        - **"default.newApp.gql"**
+          > **appPort:** the default listening port the new **_GraphQL application_** will be listening on
+          > **apiVersion:** the API version number the new **_GraphQL application_** is providing
+          > **defaultPageSize:** the default page size for the new **_GraphQL application_**
+          > **maxQueryDepthAllowed:** the maximum depth a query can have. The value must be greater than 1.
+          > **maxQueryComplexityAllowed:** the maximum number of data fields a query can include. The value must be greater than 1.
+          > **httpRequestResponseTimeout:** the HTTP timeout value when querying from the OData layer
+          > **introspectionEnabled:** enables schema introspection (recommand to set it to "false" for Production environment by default)
+
       - **"\<schemaConnectionName>"**
 
-        > Add the connection information section with its own unique **"\<schemaConnectionName>"** for your databases following the 3 examples (_"arms"_, _"bikeStore"_, and _"arms_sql"_) found in the default property file.
+        > Add the connection information section with its own unique **"\<schemaConnectionName>"** for your databases following the 3 examples (**_"ex_mssql"_**, **_"ex_mysql"_**, and **_"ex_oracle"_**) found in the default property file.
 
-        > Please note that based on your database type: **_"mssql"_**, **_"mysql"_**, or **_"oracle"_**, the database identifier names are **_"databasename"_**, **_"database"_**, and **_"servicename"_**.
+        > Please note that based on your database type: **_"mssql"_**, **_"mysql"_**, or **_"oracle"_**, the database identifier names are **_"databaseName"_**, **_"database"_**, and **_"serviceName"_**.
 
       - **"\<schemaConnectionName>._is4SFDC_"**
 
@@ -65,6 +90,14 @@ Currently this tool only generates Query code for **_GraphQL_**, and the generat
 
         > The password field needs to be **encrypted** using a **_"secureKey"_** of your choice with the default Algorithm (**_"AES"_**) and default Mode (**_"CBC"_**) (which you are free to change). The value of the **_"secureKey"_** will also be needed at the OData/GraphQL projects runtime if you use the generated code without any modification.
 
+      - **"\<schemaConnectionName>._databaseName | database | serviceName_"** (for MsSql | MySql | Oracle)
+
+        > Specify the database name or the database service name according to the database type as following:
+
+        - MsSql: **_databaseName_**
+        - MySql: **_database_**
+        - Oracle: **_serviceName_**
+
 2.  Update "Schema-Info.xml"
 
 - in **_"Global Elements"_** tab
@@ -73,7 +106,7 @@ Currently this tool only generates Query code for **_GraphQL_**, and the generat
 
 - in **_"Message Flow"_** tab
 
-  > Create a **"_getSchema_.\<schemaConnectionName>"** sub-flow for your database by copy/paste an arbitrary one of the 3 examples found in the file, ex. **_"getSchema_**._arms"_, **_"getSchema_**._bikeStore"_, and **_"getSchema_**._arms_mysql"_, and then change the **_"Connector configuration"_** to point to your newly created **_"Database Config"_** fir your database.
+  > Create a **"_getSchema_.\<schemaConnectionName>"** sub-flow for your database by copy/paste an arbitrary one of the 3 examples found in the flow configuration file: **_"getSchema.ex_mssql"_**, **_"getSchema.ex_mysql"_**, and **_"getSchema.ex_oracle"_**, and then change the **_"Connector configuration"_** to point to your newly created **_"Database Config"_** for your database.
 
   > **Note:** The **"\<schemaConnectionName>"** used in **_"getSchema._\<schemaConnectionName>"** as part of the sub-flow name must match the **\<schemaConnectionName>** specified in the **_"schemaConnection"_** section found in **_"dev-properties.yaml"_**.
 
@@ -81,13 +114,13 @@ Currently this tool only generates Query code for **_GraphQL_**, and the generat
 
 - 1. Create an **_empty Postman collection_** and export it to a JSON file.
 
-- 2. Copy the exported Empty Postman Collection JSON file somewhere under **_"src/main/resources"_** directory.
+- 2. Copy the exported Empty Postman Collection JSON file into the project somewhere under **_"src/main/resources"_** directory.
 
 - 3. Configure the **_filename.input.postmanCollection_** to point to this exported file (relative to **_"src/main/resources"_**) in the **_dev-properties.yaml_**.
 
 ### Step 2. Generate the database metadata information
 
-- Issue a GET against the endpoint **"_/schemaInfo/_\<schemaConnectionName>"**
+- Issue a GET against the endpoint **"http://localhost:8888/schemaInfo/<schemaConnectionName\>"**
 
   > It creates the assets based on the database metadata (including the foreign key definition) under the **"\<db-access-code-generator>/_generated_/\<schemaConnectionName>/_schemaInfo_"** directory, which will be used as the base for any further code generation:
 
@@ -101,13 +134,13 @@ Currently this tool only generates Query code for **_GraphQL_**, and the generat
 
   - **"_keyColumnCount\_\_\<N>\_\<tableName>_\_noContent.txt\_"**
 
-    > This type of files has empty content and is trying to use its filename to notify the users that there exists tables of which the key column count is not exactly 1 and must be fixed before start generating the implementation code because currently this code generator program only supports tables with a single key column.
+    > This type of files has empty content and is trying to use its filename to notify the users that there exists tables of which the key column count is not exactly 1. If the key column count is 0, then it must be fixed before start generating the implementation code because currently this code generator program only supports tables with a single key column.
 
     > This issue can either be fixed in database and then re-invoke the **"_/schemaInfo/_\<schemaConnectionName>"** endpoint, or temporarily modify the generated **"\<schemaConnectionName>_\_schema.json"_** in order to generate the initial implementation and then manually update the generated code to support the tables with 0 or more than 1 key columns.
 
 ### Step 3. Generate the _OData_ schema definition, REST API definition, and implementation
 
-- Issue a GET against the **"_/schemaCodeGen/odata/_\<schemaConnectionName>"**  
+- Issue a GET against the **"http://localhost:8888/schemaCodeGen/odata/<schemaConnectionName\>"**  
    It creates the assets needed for your **_OData_** project under the **"\<db-access-code-generator>_/generated/_\<schemaConnectionName>/OData/"** directory:
 
   - **_"/api/"_** folder
@@ -168,7 +201,7 @@ Currently this tool only generates Query code for **_GraphQL_**, and the generat
 
 ### Step 4. Generate the _GraphQL_ schema definition and implementation
 
-- Issue a GET against the "/schemaCodeGen/gql/<schemaConnectionName>"
+- Issue a GET against the **"http://localhost:8888/schemaCodeGen/gql/<schemaConnectionName\>"**
 
   > It creates the assets needed for your **_GraphQL_** project under the **"\<db-access-code-generator>/_generated_/\<schemaConnectionName>/_GraphQL_"** directory:
 
