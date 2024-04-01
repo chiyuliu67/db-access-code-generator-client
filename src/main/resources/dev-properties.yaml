@@ -1,11 +1,9 @@
 applicationName: 'db-access-code-generator-client'
 codeGenService:
-  host2: 'localhost'
-  port2: '8082'
   host: 'dev-db-access-code-generator-services.us-e2.cloudhub.io'
   port: '443'
 filename:
-  baseDir: '/Users/chiyu/AnypointStudio/prototype/db-access-code-generator-client'
+  baseDir: '/<yourOwnWorkspaceDirectory>/db-access-code-generator-client'
   input:
     postmanCollection: 'EMPTY.postman_collection.json'
   output:
@@ -33,9 +31,9 @@ schemaConnection:
     tablenames: 'production.brands, production.categories, production.products, production.stocks, sales.customers, sales.order_items, sales.orders, sales.staffs, sales.stores'
     host: 'local-vm-rocky'
     port: '1433'
-    username: 'sa'
+    username: 'username'
     password: '![rowZ8nB7SxP1mSSAXtLK3Q==]'
-    databaseName: 'BikeStores'
+    databaseName: 'someSqlServerDatabaseName'
   ex_oracle:
     newApp:
       odata:
@@ -50,9 +48,9 @@ schemaConnection:
     tablenames: 'CONTACTS, COUNTRIES, CUSTOMERS, EMPLOYEES, INVENTORIES, LOCATIONS, ORDER_ITEMS, ORDERS, PRODUCT_CATEGORIES, PRODUCTS, REGIONS, WAREHOUSES'
     host: 'local-vm-rocky'
     port: '1521'
-    username: 'arms'
+    username: 'username'
     password: '![rowZ8nB7SxP1mSSAXtLK3Q==]'
-    serviceName: 'NNLPDB1'
+    serviceName: 'someOracleDatabaseServiceName'
   ex_mysql:
     newApp:
       odata:
@@ -63,10 +61,10 @@ schemaConnection:
         apiVersion: '1'
     is4SFDC: 'true'
     dbtype: 'mysql'
-    schemaname: 'ARMS'
+    schemaname: 'someMySqlSchemaname'
     tablenames: 'CONTACTS, COUNTRIES, CUSTOMERS, EMPLOYEES, INVENTORIES, LOCATIONS, ORDER_ITEMS, ORDERS, PRODUCT_CATEGORIES, PRODUCTS, REGIONS, WAREHOUSES, SALES'
     host: 'local-vm-rocky'
     port: '3306'
-    username: 'root'
+    username: 'username'
     password: '![rowZ8nB7SxP1mSSAXtLK3Q==]'
-    database: 'ARMS'
+    database: 'someMySqlDatbase'
