@@ -14,7 +14,6 @@ http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/m
 			<ee:message />
 			<ee:variables>
 				<ee:set-variable variableName="filename"><![CDATA[%dw 2.0
-import * from dw::util::Coercions
 output application/java
 var schema = attributes.uriParams.schemaConnection
 var dbtype = p( 'schemaConnection.' ++ schema ++ '.dbtype' )
@@ -40,14 +39,14 @@ p( 'schemaConnection.' ++ attributes.uriParams.schemaConnection ++ '.dbtype' )]]
 			</ee:variables>
 		</ee:transform>
 		<flow-ref doc:name="generate_requiredProperties" doc:id="5481d898-065b-4c37-8c17-1830ed5cd8e2" name='#["odata.writeProperty." ++ vars.dbtype]'/>
-		<file:write doc:name="Write properties" doc:id="fd907191-cfd3-4a7d-97d9-8a2e1fca0fc8" config-ref="File_Config" path='#[vars.filename.out.dir ++ "dev-properties.yaml"]'>
+		<file:write doc:name="Write properties" doc:id="fd907191-cfd3-4a7d-97d9-8a2e1fca0fc8" config-ref="File_Config_baseDir" path='#[vars.filename.out.dir ++ "dev-properties.yaml"]'>
 			<file:content><![CDATA[#[vars.properties]]]></file:content>
 
 		</file:write>
 		<file:read doc:name="Read emptyPostmanCollection" doc:id="ff94816b-fd59-43a5-8963-56d5446938bc" path="${mule.home}/apps/${applicationName}/${filename.input.postmanCollection}" outputMimeType="application/json" target="emptyPostmanCollection" />
-		<file:read doc:name="Read schemaInfo" doc:id="6777769d-06a1-475e-afb7-103150c2ac26" config-ref="File_Config" path="#[vars.filename.in.schemaJson]" target="schemaInfo" outputMimeType="application/json"/>
-		<file:read doc:name="Read navigationReference" doc:id="8c4bdd14-d1d1-4e1e-b51e-5a296e2a4dd1" config-ref="File_Config" path="#[vars.filename.in.navRefJson]" target="fkInfo" outputMimeType="application/json"/>
-		<http:request method="POST" doc:name="Request" doc:id="c70dc344-66b6-4d99-947a-052c0ec60e80" path='#["/schemaCodeGen/odata"]' config-ref="HTTP_Request_configuration" responseTimeout="60000" target="zippedFileList" outputMimeType="application/json">
+		<file:read doc:name="Read schemaInfo" doc:id="6777769d-06a1-475e-afb7-103150c2ac26" config-ref="File_Config_baseDir" path="#[vars.filename.in.schemaJson]" target="schemaInfo" outputMimeType="application/json"/>
+		<file:read doc:name="Read navigationReference" doc:id="8c4bdd14-d1d1-4e1e-b51e-5a296e2a4dd1" config-ref="File_Config_baseDir" path="#[vars.filename.in.navRefJson]" target="fkInfo" outputMimeType="application/json"/>
+		<http:request method="POST" doc:name="Request" doc:id="c70dc344-66b6-4d99-947a-052c0ec60e80" path='#["/schemaCodeGen/odata"]' config-ref="HTTP_Request_configuration" responseTimeout="60000" target="assets" outputMimeType="application/json">
 			<http:body ><![CDATA[#[%dw 2.0
 import config_schemaConnection_newApp from dwUtils::newAppConfig
 import * from dw::util::Coercions
@@ -72,13 +71,13 @@ output application/json
 output application/octet-stream
 import fromBase64 from dw::core::Binaries
 ---
-fromBase64( vars.zippedFileList.zipped )]]]></compression:compressed>
+fromBase64( vars.assets.zipped )]]]></compression:compressed>
 			<compression:decompressor >
 				<compression:zip-decompressor />
 			</compression:decompressor>
 		</compression:decompress>
 		<foreach doc:name="For Each" doc:id="c786454e-d451-4b01-8bda-c4c682f1d856" collection="#[vars.fileList]">
-			<file:write doc:name="Write" doc:id="0850cc15-8a5c-4c05-8ba1-c1ebfc10e32d" path="#[vars.filename.out.dir ++ payload.outputFile]" config-ref="File_Config">
+			<file:write doc:name="Write" doc:id="0850cc15-8a5c-4c05-8ba1-c1ebfc10e32d" path="#[vars.filename.out.dir ++ payload.outputFile]" config-ref="File_Config_baseDir">
 				<file:content ><![CDATA[#[write( payload.fileContent, "text/plain" )]]]></file:content>
 			</file:write>
 		</foreach>
@@ -86,14 +85,13 @@ fromBase64( vars.zippedFileList.zipped )]]]></compression:compressed>
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 import config_schemaConnection_newApp from dwUtils::newAppConfig
-import usage from dwUtils::generateOdata4_usage
 output application/json
 ---
 { 
 	OutputFiles: ( ( vars.fileList map( e, i ) -> ( e.outputFile replace "\\" with "/" ) ) << "dev-perperties.yaml" ) orderBy $,
 //	dir: vars.filename.out.dir,
 //	schema: vars.schema,
-	Usage: usage map( e, i ) -> e 
+	Usage: vars.assets.usage map( e, i ) -> e 
 			replace '<db-access-code-generator>/' with vars.filename.out.dir
 			replace '<schemaConnectionName>' with vars.schema
 			replace '<newOdataAppPort>' with ( config_schemaConnection_newApp( p, vars.schema, ".odata.appPort", "8881" ) )

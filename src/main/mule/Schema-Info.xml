@@ -2,7 +2,8 @@
 
 <mule xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
 	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" 
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
 	xmlns:db="http://www.mulesoft.org/schema/mule/db"
 	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
@@ -12,34 +13,12 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
 http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
 http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd">
-	<configuration-properties doc:name="Configuration properties" doc:id="45c83007-51b2-49d7-8c52-9682fe158a6e" file="${env}-properties.yaml" />
-	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="7554af2a-fcf7-43b5-9a3b-c42aaaa2f6d1" file="${env}-properties.yaml" key="${secureKey}" >
-	</secure-properties:config>
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="93165de1-544e-4465-91de-69398e3fe07b" >
-		<http:listener-connection host="0.0.0.0" port="8888" />
-	</http:listener-config>
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="92c0ecf1-1266-4947-b6ec-fe75aff9f612" >
-		<http:request-connection host="${codeGenService.host}" port="${codeGenService.port}" connectionIdleTimeout="60000" protocol="HTTPS">
-			<tls:context >
-				<tls:trust-store insecure="true" />
-			</tls:context>
-		</http:request-connection>
-	</http:request-config>
-	<file:config name="File_Config" doc:name="File Config" doc:id="4f867406-ba0b-4747-ab35-d50134a03949" >
-		<file:connection workingDir="${filename.baseDir}" />
-	</file:config>
-	<db:config name="Database_Config_EX_Oracle" doc:name="Database Config" doc:id="7317e7b3-a99a-4ebb-a4f1-2ec75b50c8a2" >
-		<db:oracle-connection host="${schemaConnection.ex_oracle.host}" port="${schemaConnection.ex_oracle.port}" user="${schemaConnection.ex_oracle.username}" password="${secure::schemaConnection.ex_oracle.password}" serviceName="${schemaConnection.ex_oracle.serviceName}" />
-	</db:config>
-	<db:config name="Database_Config_EX_MsSql" doc:name="Database Config" doc:id="d170fca0-7931-4593-8d21-5bacd95d006f" >
-		<db:mssql-connection host="${schemaConnection.ex_mssql.host}" port="${schemaConnection.ex_mssql.port}" user="${schemaConnection.ex_mssql.username}" password="${secure::schemaConnection.ex_mssql.password}" databaseName="${schemaConnection.ex_mssql.databaseName}"/>
-	</db:config>
-	<db:config name="Database_Config_EX_MySql" doc:name="Database Config" doc:id="615087fc-c3b3-4b0a-84e9-139804c02e74" >
-		<db:my-sql-connection host="${schemaConnection.ex_mysql.host}" port="${schemaConnection.ex_mysql.port}" user="${schemaConnection.ex_mysql.username}" password="${secure::schemaConnection.ex_mysql.password}" database="${schemaConnection.ex_mysql.database}"/>
-	</db:config>
 	<flow name="Schema-InfoFlow" doc:id="a17038c1-0154-4850-96d7-1b6d6b181f11" >
 		<http:listener doc:name="Listener" doc:id="4d6913db-ed36-431e-b014-e620f8e48fb2" config-ref="HTTP_Listener_config" path="/schemaInfo/{schemaConnection}"/>
-		<set-variable value="#[%dw 2.0&#10;import * from dw4OdataUtil::codeGenerator::sql_schemainfo&#10;output application/java&#10;var propertyRoot = 'schemaConnection.' ++ attributes.uriParams.schemaConnection ++ &quot;.&quot;&#10;---&#10;{&#10;	connection: attributes.uriParams.schemaConnection,&#10;	dbtype: p( propertyRoot ++ &quot;dbtype&quot; ),&#10;	schemaName: p( propertyRoot ++ &quot;schemaname&quot; ),&#10;	configuredTableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) -&gt; trim( e ),&#10;	tableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) &#10;		-&gt; trim( if ( e contains( &quot;.&quot; ) ) ( e splitBy( &quot;.&quot; ) )[ 1 ] else e ),&#10;	schemaQuery: schemaQuery[ p( propertyRoot ++ &quot;dbtype&quot; ) as String ],&#10;	fkQuery: fkQuery[ p( propertyRoot ++ &quot;dbtype&quot; ) as String ]&#10;}]" doc:name="Set Variable request" doc:id="9b2b58b2-7957-4dd5-9c29-b9a3d58cf3ce" variableName="request" />
+		<set-variable value="#[attributes.uriParams.schemaConnection]" doc:name="Set Variable" doc:id="dc0b30cd-e6e5-49f8-8a4f-550a082f3847" variableName="schemaConnection"/>
+		<http:request method="GET" doc:name="Request sql" doc:id="586bb41f-2068-4b5d-a676-c1f403674155" config-ref="HTTP_Request_configuration" path='#["/schemaInfoSql/" ++ p( "schemaConnection." ++ attributes.uriParams.schemaConnection ++ ".dbtype" )]'>
+		</http:request>
+		<set-variable value="#[%dw 2.0&#10;import * from dw4OdataUtil::codeGenerator::sql_schemainfo&#10;output application/java&#10;var propertyRoot = 'schemaConnection.' ++ vars.schemaConnection ++ &quot;.&quot;&#10;---&#10;{&#10;	connection: vars.schemaConnection,&#10;	dbtype: p( propertyRoot ++ &quot;dbtype&quot; ),&#10;	schemaName: p( propertyRoot ++ &quot;schemaname&quot; ),&#10;	configuredTableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) -&gt; trim( e ),&#10;	tableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) &#10;		-&gt; trim( if ( e contains( &quot;.&quot; ) ) ( e splitBy( &quot;.&quot; ) )[ 1 ] else e ),&#10;	schemaQuery: payload.schemaQuery,&#10;	fkQuery: payload.fkQuery&#10;}]" doc:name="Set Variable request" doc:id="9b2b58b2-7957-4dd5-9c29-b9a3d58cf3ce" variableName="request" />
 		<foreach doc:name="For Each vars.request.configuredTableNames" doc:id="479296eb-8b19-402d-bc13-cfc866bcfebd" collection="#[vars.request.configuredTableNames]" >
 			<set-variable value='#[if ( payload contains( "." ) )&#10;	{&#10;		schemaName: ( payload splitBy( "." ) )[ 0 ],&#10;		tableName: ( payload splitBy( "." ) )[ 1 ]&#10;	}&#10;else&#10;	{&#10;		schemaName: vars.request.schemaName,&#10;		tableName: payload&#10;	}]' doc:name="Set Variable tablePointer" doc:id="982c37ea-e01b-46ef-a7b4-499c4b7b49bd" variableName="tablePointer" />
 			<flow-ref doc:name="getSchema" doc:id="cc38d7fd-5ae8-4347-b81d-2e0d5b389c1f" name='#["getSchema." ++ vars.request.connection]' />
@@ -61,7 +40,7 @@ http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/m
 }]]]></http:body>
 		</http:request>
 		<foreach doc:name="For Each" doc:id="651b1b15-715d-49b5-a7d5-2d140860b9df" collection="#[payload.fileList]">
-			<file:write doc:name="Write" doc:id="a66549ab-dd03-4af0-845a-97e8002df783" config-ref="File_Config" path="#[write( p( 'filename.output.base' ) ++ &quot;/&quot; ++ vars.request.connection ++ &quot;/schemaInfo/&quot; ++ payload.outputFile, &quot;text/plain&quot; )]">
+			<file:write doc:name="Write" doc:id="a66549ab-dd03-4af0-845a-97e8002df783" config-ref="File_Config_baseDir" path="#[write( p( 'filename.output.base' ) ++ &quot;/&quot; ++ vars.request.connection ++ &quot;/schemaInfo/&quot; ++ payload.outputFile, &quot;text/plain&quot; )]">
 				<file:content><![CDATA[#[write( payload.fileContent, "text/plain" )]]]></file:content>
 			</file:write>
 		</foreach>
