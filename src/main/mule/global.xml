@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd 
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="43271823-6c5b-429b-b4ea-020b7cf8af73" file="${env}-properties.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="cc0763a0-9dd2-4dd4-a2ef-37bb06919317" file="${env}-properties.yaml" key="${secureKey}" >
+	</secure-properties:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="dfb96e84-560e-43d2-b5ef-9621d76a6ca2" >
+		<http:listener-connection host="0.0.0.0" port="8888" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="168b6132-9bdb-41f6-8af2-26d691d841e0" >
+		<http:request-connection host="${codeGenService.host}" port="${codeGenService.port}" connectionIdleTimeout="60000" protocol="HTTPS">
+			<tls:context >
+				<tls:trust-store insecure="true" />
+			</tls:context>
+		</http:request-connection>
+	</http:request-config>
+	<file:config name="File_Config_baseDir" doc:name="File Config" doc:id="ba3d76fd-329e-4792-8844-8df429cd2faf" >
+		<file:connection workingDir="${filename.baseDir}" />
+	</file:config>
+	<db:config name="Database_Config_EX_Oracle" doc:name="Database Config" doc:id="f02d1763-3cf9-4e53-be5c-063e2227b8c9" >
+		<db:oracle-connection host="${schemaConnection.ex_oracle.host}" port="${schemaConnection.ex_oracle.port}" user="${schemaConnection.ex_oracle.username}" password="${secure::schemaConnection.ex_oracle.password}" serviceName="${schemaConnection.ex_oracle.serviceName}" />
+	</db:config>
+	<db:config name="Database_Config_EX_MsSql" doc:name="Database Config" doc:id="e4d4851a-1412-48ed-9400-5d61c679f62a" >
+		<db:mssql-connection host="${schemaConnection.ex_mssql.host}" port="${schemaConnection.ex_mssql.port}" user="${schemaConnection.ex_mssql.username}" password="${secure::schemaConnection.ex_mssql.password}" databaseName="${schemaConnection.ex_mssql.databaseName}"/>
+	</db:config>
+	<db:config name="Database_Config_EX_MySql" doc:name="Database Config" doc:id="e03af1b4-1631-45a7-a332-16e12182216b" >
+		<db:my-sql-connection host="${schemaConnection.ex_mysql.host}" port="${schemaConnection.ex_mysql.port}" user="${schemaConnection.ex_mysql.username}" password="${secure::schemaConnection.ex_mysql.password}" database="${schemaConnection.ex_mysql.database}"/>
+	</db:config>
+	<file:config name="File_Config_NewApp_Studio_Workspace" doc:name="File Config" doc:id="19e0ce4d-c944-496b-9862-14977bc35aad" >
+		<file:connection workingDir="${schemaConnection.default.newApp.Studio.workspace}" >
+			<reconnection />
+		</file:connection>
+	</file:config>
+
+</mule>

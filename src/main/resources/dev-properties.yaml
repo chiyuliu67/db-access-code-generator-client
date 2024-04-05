@@ -11,6 +11,8 @@ filename:
 schemaConnection:
   default:
     newApp:
+      Studio:
+        workspace: '/Users/chiyu/AnypointStudio/prototype'
       odata:
         defaultPageSize: '52'
       gql:
@@ -23,9 +25,11 @@ schemaConnection:
       odata:
         appPort: '8081'
         apiVersion: '1'
+        projectName: 'test-ex_mssql-odata'
       gql:
         appPort: '9092'
         apiVersion: '1'
+        projectName: 'test-ex_mssql-gql'
     is4SFDC: 'true'
     dbtype: 'mssql'
     tablenames: 'production.brands, production.categories, production.products, production.stocks, sales.customers, sales.order_items, sales.orders, sales.staffs, sales.stores'
@@ -39,12 +43,14 @@ schemaConnection:
       odata:
         appPort: '6061'
         apiVersion: '1'
+        projectName: 'test-ex_oracle-odata'
       gql:
         appPort: '7072'
         apiVersion: '1'
+        projectName: 'test-ex_oracle-gql'
     is4SFDC: 'false'
     dbtype: 'oracle'
-    schemaname: 'ARMS'
+    schemaname: 'someOracleSchemaname'
     tablenames: 'CONTACTS, COUNTRIES, CUSTOMERS, EMPLOYEES, INVENTORIES, LOCATIONS, ORDER_ITEMS, ORDERS, PRODUCT_CATEGORIES, PRODUCTS, REGIONS, WAREHOUSES'
     host: 'local-vm-rocky'
     port: '1521'
@@ -56,9 +62,11 @@ schemaConnection:
       odata:
         appPort: '4041'
         apiVersion: '1'
+        projectName: 'test-ex_mysql-odata'
       gql:
         appPort: '5052'
         apiVersion: '1'
+        projectName: 'test-ex_mysql-gql'
     is4SFDC: 'true'
     dbtype: 'mysql'
     schemaname: 'someMySqlSchemaname'
