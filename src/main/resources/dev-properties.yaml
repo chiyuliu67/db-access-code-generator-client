@@ -12,7 +12,7 @@ schemaConnection:
   default:
     newApp:
       Studio:
-        workspace: '/Users/chiyu/AnypointStudio/prototype'
+        workspace: '/<yourOwnNewProjectsWorkSpaceDirectory>'
       odata:
         defaultPageSize: '52'
       gql:
