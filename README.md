@@ -4,15 +4,23 @@
 
 ## Overview
 
-This is the client side of the overall Code Generator project which users will work with locally.
+This is the client side of the overall **_MuleSoft DB Access Code Generator_** project which users will work with locally. This Code Generator project currently supports **_Oracle_**, **_MySql_**, and **_Sql Server_** assets generation.
 
-It will connect to users' databases to retrieve the schema information of tables specified by the user and their relationships according to the foreign key defined, and then request the **_OData_** and **_Graph_** asset generation from the server side of the project which is hosted on CloudHub.
+This client side project will be running in user specified environment and will connect to user's databases in order to retrieve the database information. The information retrieved is the schema information (including the Foreign Key constraints) of the tables specified by the user, which serves as the input for users to request the **_OData_** and **_GraphQL_** assets from the server side asset generation services hosted on **_Anypoint CloudHub_**. Once the generated assets are obtained, users use these assets to construct the new **_MuleSoft_** projects to provide the **_OData_** and **_GraphQL_** access interface for the databases.
 
-The assets it generates are the **_OData_** and **_Graph_** API definition and implementation code, based on MuleSoft **_OData API Kit_** and **_GraphQL API Kit_** module, to provide the **_OData_** and **_Graph_** interface for the databases (currently supporting Oracle, MySql, and Sql Server), plus the Postaman collection which can be used to test the generated implementation.
+To use this tool, download this client side project and import it into your **_MuleSoft Studio_**, add your custom database connection information to its property configuration, add (by copy/paste) the database connector configuration and the corresponding operation (**"_getSchema_.\<schemaConnectionName>"** sub-flow), then execute the project in any Mule Runtime (**_Studio_**, **_CloudHub_**, on-premise) that can communicate with the databases and services hosted in **_Anypoint CloudHub_**.
 
-To use this tool, download this MuleSoft project and import it into your MuleSoft Studio, add your custom database connection information to its property configuration, add (by copy/paste) the database connector configuration and the corresponding operation, then execute the project in any Mule Runtime (Studio, CloudHub, on-premise) that can communicate with the databases.
+## _Generated Assets_
 
-The generated code supports the following:
+The generated assets include the following:
+
+- API definition for **_OData_** in RAML
+- **_"CSDL" file_** for **_OData API Kit_**
+- **_"graphql" file_** for **_GraphQL API Kit_**
+- API implementation (based on MuleSoft **_OData API Kit_** and **_GraphQL API Kit_** modules)
+- Postman collection
+
+### _Interface types_
 
 #### _OData_
 
@@ -25,7 +33,9 @@ The current generated **_OData_** code supports **_"MsSql"_**, **_"Oracle"_**, a
 - **_PUT ENTITY_**
 - **_DELETE ENTITY_**
 
-The database tables primary key, either single primary key or composite keys, must be defined. For tables with no primary key defined, it requires to be either fixed in the database or manually change the generated schemaInfo file before continuing.
+##### Regarding table keys
+
+The primary key, either single primary key or composite keys, should be defined for tables in the database. For tables with no primary key defined, it requires to be either fixed in the database or manually change the generated schemaInfo file before continuing.
 
 This tool currently support the MSSql tables with "auto-generated" primary key column. However, the "auto-generated" primary key in Oracle and MySql are not supported yet.
 
@@ -37,70 +47,70 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 ### Step 1. Update _db-access-code-generator_ project for your databases
 
-1.  Update **_"dev-properties.yaml"_**
+1. Update **_"dev-properties.yaml"_**
 
-    - **_"filename.baseDir"_**
+   - **_"filename.baseDir"_**
 
-      - Update this field to match your directory path
+     - Update this field to match your directory path
 
-    - **_"schemaConnection"_**
+   - **_"schemaConnection"_**
 
-      - **"default.newApp"**
+     - **"default.newApp"**
 
-        > This set of configuration items will be used to provide the default configuration for the new **_OData application_** and the new **_GraphQL application_** users are creating. Each of the values can be overridden at the specific **"\<schemaConnectionName>"** level.
+       > This set of configuration items will be used to provide the default configuration for the new **_OData application_** and the new **_GraphQL application_** users are creating. Each of the values can be overridden at the specific **"\<schemaConnectionName>"** level.
 
-        - **"default.Studio."**
-          > **workspace:** the file directory for the Studio Worspace where the newApps (the new OData application project and the new GraphQL project) will be worked on.
-        - **"default.newApp.odata."**
-          > **appPort:** the default listening port the new **_OData application_** will be listening on
-          > **apiVersion:** the API version number the new **_OData application_** is providing
-          > **defaultPageSize:** the default page size for the new **_OData application_** > **projectName:** the Studio project name of the new OData application project
-        - **"default.newApp.gql"**
-          > **appPort:** the default listening port the new **_GraphQL application_** will be listening on
-          > **apiVersion:** the API version number the new **_GraphQL application_** is providing
-          > **defaultPageSize:** the default page size for the new **_GraphQL application_** > **[maxQueryDepthAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum depth a query can have. The value must be greater than 1.
-          > **[maxQueryComplexityAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum number of data fields a query can include. The value must be greater than 1.
-          > **httpRequestResponseTimeout:** the HTTP timeout value when querying from the OData layer
-          > **[introspectionEnabled](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#parameters):** enables schema introspection (recommand to set it to "false" for Production environment by default)
-          > **projectName:** the Studio project name of the new GraphQL application project
+       - **"default.Studio."**
+         > **workspace:** the file directory for the Studio Worspace where the newApps (the new OData application project and the new GraphQL project) will be worked on.
+       - **"default.newApp.odata."**
+         > **appPort:** the default listening port the new **_OData application_** will be listening on
+         > **apiVersion:** the API version number the new **_OData application_** is providing
+         > **defaultPageSize:** the default page size for the new **_OData application_** > **projectName:** the Studio project name of the new OData application project
+       - **"default.newApp.gql"**
+         > **appPort:** the default listening port the new **_GraphQL application_** will be listening on
+         > **apiVersion:** the API version number the new **_GraphQL application_** is providing
+         > **defaultPageSize:** the default page size for the new **_GraphQL application_** > **[maxQueryDepthAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum depth a query can have. The value must be greater than 1.
+         > **[maxQueryComplexityAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum number of data fields a query can include. The value must be greater than 1.
+         > **httpRequestResponseTimeout:** the HTTP timeout value when querying from the OData layer
+         > **[introspectionEnabled](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#parameters):** enables schema introspection (recommand to set it to "false" for Production environment by default)
+         > **projectName:** the Studio project name of the new GraphQL application project
 
-      - **"\<schemaConnectionName>"**
+     - **"\<schemaConnectionName>"**
 
-        > Add the connection information section with its own unique **"\<schemaConnectionName>"** for your databases following the 3 examples (**_"ex_mssql"_**, **_"ex_mysql"_**, and **_"ex_oracle"_**) found in the default property file.
+       > Add the connection information section with its own unique **"\<schemaConnectionName>"** for your databases following the 3 examples (**_"ex_mssql"_**, **_"ex_mysql"_**, and **_"ex_oracle"_**) found in the default property file.
 
-        > Please note that based on your database type: **_"mssql"_**, **_"mysql"_**, or **_"oracle"_**, the database identifier names are **_"databaseName"_**, **_"database"_**, and **_"serviceName"_**.
+       > Please note that based on your database type: **_"mssql"_**, **_"mysql"_**, or **_"oracle"_**, the database identifier names are **_"databaseName"_**, **_"database"_**, and **_"serviceName"_**.
 
-      - **"\<schemaConnectionName>._is4SFDC_"**
+     - **"\<schemaConnectionName>._is4SFDC_"**
 
-        > If the generated **_OData_** implementation code is to be used as the **"External Data Source"** in **Salesforce**, the field **_"is4SFDC"_** needs to be set to **_"true"_**.
+       > If the generated **_OData_** implementation code is to be used as the **"External Data Source"** in **Salesforce**, the field **_"is4SFDC"_** needs to be set to **_"true"_**.
 
-      - **"\<schemaConnectionName>._dbtype_"**
+     - **"\<schemaConnectionName>._dbtype_"**
 
-        > This field is to specify the type of database, and the values currently supported are **_"mssql"_**, **_"mysql"_**, and **_"oracle"_**.
+       > This field is to specify the type of database, and the values currently supported are **_"mssql"_**, **_"mysql"_**, and **_"oracle"_**.
 
-      - **"\<schemaConnectionName>._schemaname_"**
+     - **"\<schemaConnectionName>._schemaname_"**
 
-        > In the case of **_"mssql"_**, this field is not used.
+       > In the case of **_"mssql"_**, this field is not used.
 
-      - **"\<schemaConnectionName>._tablenames_"**
+     - **"\<schemaConnectionName>._tablenames_"**
 
-        > Use this field to list all the names of the tables you'd like to have the code generator to generate the (**_OData_** and/or **_GraphQL_**) implementation code for you.
+       > Use this field to list all the names of the tables you'd like to have the code generator to generate the (**_OData_** and/or **_GraphQL_**) implementation code for you.
 
-        > In the case of **_"mssql"_**, the field **_"schemaname"_** is not needed, but the way to specify the name of the tables need to be **"\<schemaname>.\<tablename>"**, for example, **_"PRODUCTION.BRANDS"_**
+       > In the case of **_"mssql"_**, the field **_"schemaname"_** is not needed, but the way to specify the name of the tables need to be **"\<schemaname>.\<tablename>"**, for example, **_"PRODUCTION.BRANDS"_**
 
-      - **"\<schemaConnectionName>._password_"**
+     - **"\<schemaConnectionName>._password_"**
 
-        > The password field needs to be **encrypted** using a **_"secureKey"_** of your choice with the default Algorithm (**_"AES"_**) and default Mode (**_"CBC"_**) (which you are free to change). The value of the **_"secureKey"_** will also be needed at the OData/GraphQL projects runtime if you use the generated code without any modification.
+       > The password field needs to be **encrypted** using a **_"secureKey"_** of your choice with the default Algorithm (**_"AES"_**) and default Mode (**_"CBC"_**) (which you are free to change). The value of the **_"secureKey"_** will also be needed at the OData/GraphQL projects runtime if you use the generated code without any modification.
 
-      - **"\<schemaConnectionName>._databaseName | database | serviceName_"** (for MsSql | MySql | Oracle)
+     - **"\<schemaConnectionName>._databaseName | database | serviceName_"** (for MsSql | MySql | Oracle)
 
-        > Specify the database name or the database service name according to the database type as following:
+       > Specify the database name or the database service name according to the database type as following:
 
-        - MsSql: **_databaseName_**
-        - MySql: **_database_**
-        - Oracle: **_serviceName_**
+       - MsSql: **_databaseName_**
+       - MySql: **_database_**
+       - Oracle: **_serviceName_**
 
-2.  Update "Schema-Info.xml"
+2. Update "Schema-Info.xml"
 
 - in **_"Global Elements"_** tab
 
