@@ -62,7 +62,7 @@ output application/json
 	schema: vars.schema,
 	schemaInfo: vars.schemaInfo,
 	fkInfo: vars.fkInfo,
-	schemaConnectionProperties: { is4SFDC: toBoolean( p( 'schemaConnection.' ++ vars.schema ++ '.is4SFDC' ) ), dbtype: p( 'schemaConnection.' ++ vars.schema ++ '.dbtype' ) },
+	schemaConnectionProperties: { dbtype: p( 'schemaConnection.' ++ vars.schema ++ '.dbtype' ) },
 	emptyPostmanCollection: vars.emptyPostmanCollection
 }]]]></http:body>
 		</http:request>
