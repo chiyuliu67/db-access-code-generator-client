@@ -80,10 +80,6 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
        > Please note that based on your database type: **_"mssql"_**, **_"mysql"_**, or **_"oracle"_**, the database identifier names are **_"databaseName"_**, **_"database"_**, and **_"serviceName"_**.
 
-     - **"\<schemaConnectionName>._is4SFDC_"**
-
-       > If the generated **_OData_** implementation code is to be used as the **"External Data Source"** in **Salesforce**, the field **_"is4SFDC"_** needs to be set to **_"true"_**.
-
      - **"\<schemaConnectionName>._dbtype_"**
 
        > This field is to specify the type of database, and the values currently supported are **_"mssql"_**, **_"mysql"_**, and **_"oracle"_**.
