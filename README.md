@@ -148,119 +148,115 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 ### Step 3. Generate the _OData_ schema definition, REST API definition, and implementation
 
-- Issue a GET against the **"http://localhost:8888/schemaCodeGen/odata/<schemaConnectionName\>"**
+#### 3-a. Issue a GET against the **"http://localhost:8888/schemaCodeGen/odata/<schemaConnectionName\>"**
 
-  > It creates the assets needed for your **_OData_** project under the **"\<db-access-code-generator>_/generated/_\<schemaConnectionName>/OData/"** directory:
+> It creates the assets needed for your **_OData_** project under the **"\<db-access-code-generator>_/generated/_\<schemaConnectionName>/OData/"** directory:
 
-  - **_"/api/"_** folder
+- **_"/api/"_** folder
 
-    > The new **_OData_** project needs this folder under **_"src/main/resources"_**.
+  > The new **_OData_** project needs this folder under **_"src/main/resources"_**.
 
-    > This folder contains the **_CSDL_** file required by **_"APIKit for OData"_** and the **_RAML_** files define the **_OData_** REST API.
+  > This folder contains the **_CSDL_** file required by **_"APIKit for OData"_** and the **_RAML_** files define the **_OData_** REST API.
 
-  - **_"/dw4Odata/"_** folder
+- **_"/dw4Odata/"_** folder
 
-    > The new **_OData_** project needs this folder under **_"src/main/resources"_**.
+  > The new **_OData_** project needs this folder under **_"src/main/resources"_**.
 
-  - **"\<schemaConnectionName>_\_OData.xml_"**
+- **"\<schemaConnectionName>_\_OData.xml_"**
 
-    > The new **_OData_** project needs this file under **_"src/main/mule"_**.
+  > The new **_OData_** project needs this file under **_"src/main/mule"_**.
 
-    > This is the main **_OData_** implementation file.
+  > This is the main **_OData_** implementation file.
 
-  - **_"global.xml"_**
+- **_"global.xml"_**
 
-    > The new **_OData_** project needs this file under **_"src/main/mule"_**.
+  > The new **_OData_** project needs this file under **_"src/main/mule"_**.
 
-    > This file contains the **_"Global Elements"_** needed for your **_OData_** project.
+  > This file contains the **_"Global Elements"_** needed for your **_OData_** project.
 
-  - **"\<schemaConnectionName>_\_properties.yaml_"**
+- **"\<schemaConnectionName>_\_properties.yaml_"**
 
-    > The new **_OData_** project needs this file under **_"src/main/resources"_**.
+  > The new **_OData_** project needs this file under **_"src/main/resources"_**.
 
-    > This file contains all the required properties required by the generated **_OData_** implementation.
+  > This file contains all the required properties required by the generated **_OData_** implementation.
 
-  - **"\<schemaConnectionName>_\_postman.json_"**
+- **"\<schemaConnectionName>_\_postman.json_"**
 
-    > Import this file into Postman to test the generated code.
+  > Import this file into Postman to test the generated code.
 
-    > This file is built out of the empty postman file specified by the configuration value of **_filename.input.postmanCollection_** found in **_"dev-properties.yaml"_**.
+  > This file is built out of the empty postman file specified by the configuration value of **_filename.input.postmanCollection_** found in **_"dev-properties.yaml"_**.
 
-    > The generated **_Postman_** element is to help the users to test the **_"$expand"_** on all objects.
+  > The generated **_Postman_** element is to help the users to test the **_"$expand"_** on all objects.
 
-  - **_"odata4_POMDependencies.txt"_**
+- **_"samplePOM.xml"_**
 
-    > Merge the content of this file into the **_"pom.xml"_** inside your **_OData_** project.
+  > The **_<build>_** and the **_<dependencies>_** elements in this file will be used by the **_copy2newApp_** operation to update the new **_OData_** pojrect **_"pom.xml"_** file.
 
-  - **_"odata4_Suggested_Log4J_Loggers.txt"_**
+- **_"sampleLog4J2.xml"_**
 
-    > Merge the content of this file into the **_"src/main/resources/log4j2.xml"_** inside your **_OData_** project.
-
-    > It contains the **_"loggers"_** defined for the logging **_"Categories"_** for easy logging configuration at runtime.
-
-    > This step is optional.
+  > The **_<AsyncLogger>_** with the attribute **_name_** starts with **_ODATA_** in this file will be used by the **_copy2newApp_** operation to update the new **_OData_** pojrect **_"log4j2.xml"_** file.
 
 - Current version generates the codes support the following:
 
   - Tables with Composite Key
   - **_mssql_** with **_auto-generated_** ID column (but currently doesn't support the auto-generated ID in **_"oracle"_** and **_"mysql"_** yet)
 
-- You can issue a GET against the **"http://localhost:8888/copy2newApp/odata/<schemaConnectionName\>"** to copy these generated assets to the right places in the new **_OData_** project.
+#### 3-b. GET **"http://localhost:8888/copy2newApp/odata/<schemaConnectionName\>"**
+
+> It populates the new **_OData_** project with the generated assets, and update its pom.xml and log4j2.xml.
 
 ### Step 4. Generate the _GraphQL_ schema definition and implementation
 
-- Issue a GET against the **"http://localhost:8888/schemaCodeGen/gql/<schemaConnectionName\>"** to generate the new _GraphQL_ project required assets.
+#### 4-a. GET **"http://localhost:8888/schemaCodeGen/gql/<schemaConnectionName\>"**
 
-  > It creates the assets needed for your **_GraphQL_** project under the **"\<db-access-code-generator>/_generated_/\<schemaConnectionName>/_GraphQL_"** directory:
+> It creates the assets needed for your **_GraphQL_** project under the **"\<db-access-code-generator>/_generated_/\<schemaConnectionName>/_GraphQL_"** directory:
 
-  - **_"/api/"_** folder
+- **_"/api/"_** folder
 
-    > The new **_GraphQL_** project needs this folder under **_"src/main/resources"_**.
+  > The new **_GraphQL_** project needs this folder under **_"src/main/resources"_**.
 
-    > This folder contains the **_"<schemaConnectionName>.graphql"_** file required by **_"APIKit for GraphQL"_**.
+  > This folder contains the **_"<schemaConnectionName>.graphql"_** file required by **_"APIKit for GraphQL"_**.
 
-  - **_"/dw4gql/"_** folder
+- **_"/dw4gql/"_** folder
 
-    The new **_GraphQL_** project needs this folder under **_"src/main/resources"_**.
+  The new **_GraphQL_** project needs this folder under **_"src/main/resources"_**.
 
-  - **"\<schemaConnectionName>_\_GraphQL.xml_"**
+- **"\<schemaConnectionName>_\_GraphQL.xml_"**
 
-    > The new **_GraphQL_** project needs this file under **_"src/main/mule"_**.
+  > The new **_GraphQL_** project needs this file under **_"src/main/mule"_**.
 
-    > This is the main **_GraphQL_** implementation file.
+  > This is the main **_GraphQL_** implementation file.
 
-    > After past the file into your new **_GraphQL_** project, it is suggested to open it in the **_"COnfiguration XML"_** tab and perform a "select all"/"copy"/"past" the XML content to trigger Studio to generate new **_"doc:it"_** for all elements.
+  > After past the file into your new **_GraphQL_** project, it is suggested to open it in the **_"COnfiguration XML"_** tab and perform a "select all"/"copy"/"past" the XML content to trigger Studio to generate new **_"doc:it"_** for all elements.
 
-  - **"\<schemaConnectionName>_\_global.xml_"**
+- **"\<schemaConnectionName>_\_global.xml_"**
 
-    > The new **_GraphQL_** project needs this file under **_"src/main/mule"_**.
+  > The new **_GraphQL_** project needs this file under **_"src/main/mule"_**.
 
-    > This file contains the **_"Global Elements"_** needed for your **_GraphQL_** project.
+  > This file contains the **_"Global Elements"_** needed for your **_GraphQL_** project.
 
-  - **"_dev-_\<schemaConnectionName>_-properties.yaml_**
+- **"_dev-_\<schemaConnectionName>_-properties.yaml_**
 
-    > The new **_GraphQL_** project needs this file under **_"src/main/resources"_**.
+  > The new **_GraphQL_** project needs this file under **_"src/main/resources"_**.
 
-    > This file contains all the required properties required by the generated **_GraphQL_** implementation.
+  > This file contains all the required properties required by the generated **_GraphQL_** implementation.
 
-  - **"\<schemaConnectionName>_\_gqlPostman.json_"**
+- **"\<schemaConnectionName>_\_gqlPostman.json_"**
 
-    > Import this file into Postman to test the generated code.
+  > Import this file into Postman to test the generated code.
 
-    > This file is built out of the empty postman file specified by the configuration value of **_filename.input.postmanCollection_** found in **_"dev-properties.yaml"_**.
+  > This file is built out of the empty postman file specified by the configuration value of **_filename.input.postmanCollection_** found in **_"dev-properties.yaml"_**.
 
-    > The generated **_Postman_** element is to help the users to test the linked objects on all objects.
+  > The generated **_Postman_** element is to help the users to test the linked objects on all objects.
 
-  - **_"POMDependencies.txt"_**
+- **_"samplePOM.xml"_**
 
-    > Merge the content of this file into the "pom.xml" for your **_GraphQL_** project.
+  > The **_<build>_** and the **_<dependencies>_** elements in this file will be used by the **_copy2newApp_** operation to update the new **_GraphQL_** pojrect **_"pom.xml"_** file.
 
-  - **_"GraphQL_Suggested_Log4J_Loggers.txt"_**
+- **_"sampleLog4J2.xml"_**
 
-    > Merge the content of this file into the "src/main/resources/log4j2.xml" of your **_GraphQL_** project.
+  > The **_<AsyncLogger>_** with the attribute **_name_** starts with **_GraphQL_** in this file will be used by the **_copy2newApp_** operation to update the new **_GraphQL_** pojrect **_"log4j2.xml"_** file.
 
-    > It contains the loggers defined for the logging "Categories" for easy logging configuration at runtime.
+#### 4-b. GET **"http://localhost:8888/copy2newApp/gql/<schemaConnectionName\>"**
 
-    > This step is optional.
-
-- You can issue a GET against the **"http://localhost:8888/copy2newApp/gql/<schemaConnectionName\>"** to copy these generated assets to the right places in the new **_GraphQL_** project.
+> It populates the new **_GraphQL_** project with the generated assets, and update its pom.xml and log4j2.xml
