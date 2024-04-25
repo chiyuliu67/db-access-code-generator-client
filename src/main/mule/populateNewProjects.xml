@@ -10,10 +10,22 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<flow name="populateNewODataProject" doc:id="3f90c5db-7beb-4f48-8421-7320a950ef48" >
 		<http:listener doc:name="Listener" doc:id="a40eef70-e3c4-4cdd-be8c-cf985e7c73c2" config-ref="HTTP_Listener_config" path="/copy2newApp/{targetType}/{schemaConnection}"/>
-				<ee:transform doc:name="Prepare Variables" doc:id="f5a3b8c8-5ba7-4b36-b9c1-af495519864a">
+<!-- 
+		<set-variable value='#[%dw 2.0&#10;import prop from dw::Runtime&#10;import substringAfter,substringBefore from dw::core::Strings&#10;output application/json&#10;-&#45;&#45;&#10;( payload filter !$.attributes.directory ) map &#10;	{&#10;		filename: $.attributes.fileName,&#10;		relative: 		do {&#10;			var relative = ( $.attributes.path substringAfter( targetType ++ prop( "file.separator" ) ) ) substringBefore( $.attributes.fileName )&#10;			-&#45;&#45;&#10;			if ( isEmpty( relative ) ) ".\\" else relative&#10;		},&#10;		absolute: $.attributes.path&#10;	}]' doc:name="Set Variable fileList" doc:id="5252422d-1c72-4374-947f-6962d084561d" variableName="fileList"/>
+		<foreach doc:name="For Each" doc:id="a8d9a54a-d04f-464f-a208-16d96b292152" collection="#[vars.fileList]">
+			<file:copy doc:name="Copy" doc:id="2cf2bcc3-89bf-4dd2-8cf3-1828f8ca8a79" config-ref="File_Config_NewApp_Studio_Workspace" sourcePath="#[payload.absolute]" targetPath='#["src/main/resources/" ++ payload.relative]' overwrite="true"/>
+			<choice doc:name="Choice" doc:id="9d9f1b40-f60f-4519-b600-509d1dc6db32" >
+				<when expression="#[vars.matchFound]">
+					<file:move doc:name="Move" doc:id="228a5be7-d723-4967-8a47-3400ec5cc641" sourcePath="#[payload]" targetPath="#[vars.filename.newProjectBackupDir]"/>
+				</when>
+			</choice>
+			<file:copy doc:name="Copy" doc:id="1ba4b0af-b691-41a2-974b-f12619fbdcd9" config-ref="File_Config_baseDir"/>
+ </foreach>
+ -->
+		<ee:transform doc:name="Prepare Variables" doc:id="f5a3b8c8-5ba7-4b36-b9c1-af495519864a">
 			<ee:message />
 			<ee:variables>
-				<ee:set-variable variableName="targetType" ><![CDATA[if ( lower( attributes.uriParams.targetType ) ~= "odata" ) "OData" else "GraphQL"]]></ee:set-variable>
+				<ee:set-variable variableName="targetType"><![CDATA[if ( lower( attributes.uriParams.targetType ) ~= "odata" ) "OData" else "GraphQL"]]></ee:set-variable>
 				<ee:set-variable variableName="filename"><![CDATA[%dw 2.0
 output application/json
 var schema = attributes.uriParams.schemaConnection
@@ -35,33 +47,37 @@ var newAppProjectKey = '.newApp.' ++ requestTypeKey ++ '.projectName'
 			
 </ee:variables>
 		</ee:transform>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="cefb9460-532b-4aff-98c0-d55204559830" >
+			<route >
+				<flow-ref doc:name="copy_paste_assets_to_newApp" doc:id="1cbf060a-2241-41b6-9019-4250f999b733" name="copy_paste_assets_to_newApp"/>
+			</route>
+			<route >
+				<flow-ref doc:name="update_newApp_POM" doc:id="098a8162-363d-4eae-a40d-109212e62aea" name="update_newApp_POM"/>
+			</route>
+			<route >
+				<flow-ref doc:name="update_newApp_log4j2" doc:id="89ec9a75-d16c-40ed-9d83-c04598bee797" name="update_newApp_log4j2"/>
+			</route>
+		</scatter-gather>
+		<set-payload value='#[{&#10;	message: "log4j2.xml and pom.xml have been updated. Generated assets has been copied to the new project under directory " ++ vars.filename.newProjectDir&#10;}]' doc:name="Set Payload" doc:id="5632269d-7363-4083-b011-1d5a79a0c5da" />
+		<logger level="INFO" doc:name="Logger" doc:id="8e615923-d4c2-4c02-b58b-f81d39cce436" message="#[payload]" />
+	
+
+</flow>
+	<sub-flow name="copy_paste_assets_to_newApp" doc:id="15188d04-6425-40f3-b3b0-4a335fc04a13" >
 		<file:list doc:name="List generated" doc:id="2bd85ad0-23b3-4f55-a2b7-c970fbdbd91d" directoryPath="#[vars.filename.in.generated]" recursive="true" config-ref="File_Config_baseDir">
 			<non-repeatable-iterable />
 		</file:list>
-<!-- 
-		<set-variable value='#[%dw 2.0&#10;import prop from dw::Runtime&#10;import substringAfter,substringBefore from dw::core::Strings&#10;output application/json&#10;-&#45;&#45;&#10;( payload filter !$.attributes.directory ) map &#10;	{&#10;		filename: $.attributes.fileName,&#10;		relative: 		do {&#10;			var relative = ( $.attributes.path substringAfter( targetType ++ prop( "file.separator" ) ) ) substringBefore( $.attributes.fileName )&#10;			-&#45;&#45;&#10;			if ( isEmpty( relative ) ) ".\\" else relative&#10;		},&#10;		absolute: $.attributes.path&#10;	}]' doc:name="Set Variable fileList" doc:id="5252422d-1c72-4374-947f-6962d084561d" variableName="fileList"/>
-		<foreach doc:name="For Each" doc:id="a8d9a54a-d04f-464f-a208-16d96b292152" collection="#[vars.fileList]">
-			<file:copy doc:name="Copy" doc:id="2cf2bcc3-89bf-4dd2-8cf3-1828f8ca8a79" config-ref="File_Config_NewApp_Studio_Workspace" sourcePath="#[payload.absolute]" targetPath='#["src/main/resources/" ++ payload.relative]' overwrite="true"/>
-			<choice doc:name="Choice" doc:id="9d9f1b40-f60f-4519-b600-509d1dc6db32" >
-				<when expression="#[vars.matchFound]">
-					<file:move doc:name="Move" doc:id="228a5be7-d723-4967-8a47-3400ec5cc641" sourcePath="#[payload]" targetPath="#[vars.filename.newProjectBackupDir]"/>
-				</when>
-			</choice>
-			<file:copy doc:name="Copy" doc:id="1ba4b0af-b691-41a2-974b-f12619fbdcd9" config-ref="File_Config_baseDir"/>
- </foreach>
- -->
-
-		<foreach doc:name="For Each generated" doc:id="571d6466-2858-477a-a677-2d0847ca109a" collection="#[payload]">
-			<choice doc:name="Choice" doc:id="bf363e36-8689-4a7f-ab60-f38c5881d138" >
-				<when expression="#[!attributes.directory]">
+		<foreach doc:name="Copy/paste from generated to newApp src/main/resources" doc:id="571d6466-2858-477a-a677-2d0847ca109a" collection="#[payload]">
+			<choice doc:name="Choice" doc:id="bf363e36-8689-4a7f-ab60-f38c5881d138">
+				<when expression="#[!attributes.directory and !(attributes.fileName ~= 'sampleLog4J2.xml') and !(attributes.fileName ~= 'samplePOM.xml' )]">
 					<set-variable value='#[import substringAfter from dw::core::Strings&#10;---&#10;( attributes.path replace "\\" with "/" ) substringAfter( vars.targetType ++ "/" )]' doc:name="Set Variable" doc:id="babf7b01-b156-41dd-b660-7c67fd19c2ab" variableName="newProjectFilename" />
-					<try doc:name="Try" doc:id="7232f07c-92a5-4b17-a912-69ab31e170af" >
-						<file:write doc:name="Write" doc:id="ea114b5a-6c00-4ac1-8b75-7b82dd4bac88" path='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ vars.newProjectFilename]' config-ref="File_Config_NewApp_Studio_Workspace" mode="CREATE_NEW" >
+					<try doc:name="Try" doc:id="7232f07c-92a5-4b17-a912-69ab31e170af">
+						<file:write doc:name="Write" doc:id="ea114b5a-6c00-4ac1-8b75-7b82dd4bac88" path='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ vars.newProjectFilename]' config-ref="File_Config_NewApp_Studio_Workspace" mode="CREATE_NEW">
 							<error-mapping sourceType="FILE:FILE_ALREADY_EXISTS" targetType="APP:AVOID_OVERWRITE" />
 						</file:write>
-						<error-handler >
+						<error-handler>
 							<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="770f6a87-89c6-4441-86b7-6259c9c8d69b" type="APP:AVOID_OVERWRITE">
-								<file:write doc:name="Write" doc:id="59b667c8-c604-41ee-b23d-f1a90bafa39d" config-ref="File_Config_NewApp_Studio_Workspace" path='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ vars.newProjectFilename ++ "_AvoidOverwrite"]'/>
+								<file:write doc:name="Write" doc:id="59b667c8-c604-41ee-b23d-f1a90bafa39d" config-ref="File_Config_NewApp_Studio_Workspace" path='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ vars.newProjectFilename ++ "_AvoidOverwrite"]' />
 							</on-error-continue>
 						</error-handler>
 					</try>
@@ -69,14 +85,14 @@ var newAppProjectKey = '.newApp.' ++ requestTypeKey ++ '.projectName'
 			</choice>
 		</foreach>
 		<file:list doc:name="newApp src/main/mule" doc:id="eb10af35-08d8-4500-a46a-9a59c5191420" config-ref="File_Config_NewApp_Studio_Workspace" directoryPath="#[vars.filename.out.newProjectDir ++ '/src/main/resources']" target="fileList" targetValue="#[( payload filter ! ( $.attributes.fileName ~= 'log4j2.xml' ) ) map $.attributes.fileName]">
-			<file:matcher filenamePattern="regex:\w.*\.xml$"/>
+			<file:matcher filenamePattern="regex:\w.*\.xml$" />
 		</file:list>
-		<foreach doc:name="For Each .xml file" doc:id="7aa3b702-5adf-4193-a1b6-3ca662e2ff28" collection="#[vars.fileList]">
-			<try doc:name="Try" doc:id="923d3a74-ece8-4976-a8f3-7cda2504a7f2" >
-				<file:move doc:name="Move" doc:id="83d7c39d-8619-49c7-ac3c-9698d03c41f6" config-ref="File_Config_NewApp_Studio_Workspace" sourcePath='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ payload]' targetPath='#[vars.filename.out.newProjectDir ++ "/src/main/mule/"]' createParentDirectories="false" >
+		<foreach doc:name="For Each .xml file, move to newApp src/main/mule" doc:id="7aa3b702-5adf-4193-a1b6-3ca662e2ff28" collection="#[vars.fileList]">
+			<try doc:name="Try" doc:id="923d3a74-ece8-4976-a8f3-7cda2504a7f2">
+				<file:move doc:name="Move" doc:id="83d7c39d-8619-49c7-ac3c-9698d03c41f6" config-ref="File_Config_NewApp_Studio_Workspace" sourcePath='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ payload]' targetPath='#[vars.filename.out.newProjectDir ++ "/src/main/mule/"]' createParentDirectories="false">
 					<error-mapping sourceType="FILE:FILE_ALREADY_EXISTS" targetType="APP:AVOID_OVERWRITE" />
 				</file:move>
-				<error-handler >
+				<error-handler>
 					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="539d81f8-0ddd-434f-b90d-c9fb845f97b5" type="APP:AVOID_OVERWRITE">
 						<file:move doc:name="Move" doc:id="3acc3526-c3b5-4bc7-bffd-2d293065b618" config-ref="File_Config_NewApp_Studio_Workspace" sourcePath='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ payload]' targetPath='#[vars.filename.out.newProjectDir ++ "/src/main/mule/"]' createParentDirectories="false" renameTo='#[payload ++ "_AvoidOverwrite"]' overwrite="true">
 							<error-mapping sourceType="FILE:FILE_ALREADY_EXISTS" targetType="APP:AVOID_OVERWRITE" />
@@ -85,9 +101,35 @@ var newAppProjectKey = '.newApp.' ++ requestTypeKey ++ '.projectName'
 				</error-handler>
 			</try>
 		</foreach>
-		<set-payload value='#[{&#10;	message: "Generated assets has been copied to the new project under directory " ++ vars.filename.newProjectDir&#10;}]' doc:name="Set Payload" doc:id="5632269d-7363-4083-b011-1d5a79a0c5da" />
-		<logger level="INFO" doc:name="Logger" doc:id="8e615923-d4c2-4c02-b58b-f81d39cce436" message='#[payload]'/>
-	
-
-</flow>
+	</sub-flow>
+	<sub-flow name="update_newApp_POM" doc:id="1b606bc2-6164-4a6a-8e69-7b31948d6a06" >
+		<file:read doc:name="Read samplePOM" doc:id="ddfd6676-0001-4ff3-b2b5-cd44a8029c8a" config-ref="File_Config_baseDir" path='#[vars.filename.in.generated ++ "samplePOM.xml"]' target="samplePOM" outputMimeType="application/xml"/>
+		<file:read doc:name="Read projectPOM" doc:id="7149c7f5-9c58-4426-ae9c-74be66e59f7f" config-ref="File_Config_NewApp_Studio_Workspace" path='#[vars.filename.out.newProjectDir ++ "/pom.xml"]' outputMimeType="application/xml" target="projectPOM"/>
+		<file:write doc:name="Write updatedPOM" doc:id="d6699448-3302-414b-a21b-34b668c4a946" config-ref="File_Config_NewApp_Studio_Workspace" path='#[vars.filename.out.newProjectDir ++ "/pom.xml"]'>
+			<file:content ><![CDATA[#[%dw 2.0
+import update from dw::util::Values
+output application/xml
+---
+vars.projectPOM
+  update [ "project", "dependencies" ] with vars.samplePOM.project.dependencies
+  update [ "project", "build" ] with vars.samplePOM.project.build]]]></file:content>
+		</file:write>
+	</sub-flow>
+	<sub-flow name="update_newApp_log4j2" doc:id="49a38c2e-3948-4b7b-af80-bc327e788691" >
+		<file:read doc:name="Read sampleLog4J2" doc:id="dd0d0815-f88f-499e-985e-a54d9d46d929" config-ref="File_Config_baseDir" path='#[vars.filename.in.generated ++ "sampleLog4J2.xml"]' target="sampleLog4J2" />
+		<file:read doc:name="Read projectLog4J2" doc:id="d76340a7-fc09-4d29-afee-4d45fa0afd82" config-ref="File_Config_NewApp_Studio_Workspace" path='#[vars.filename.out.newProjectDir ++ "/src/main/resources/log4j2.xml"]' target="projectLog4J2"/>
+		<file:write doc:name="Write updatedLog4J2" doc:id="d6000128-2f40-417c-af00-4f1aa6934aea" config-ref="File_Config_NewApp_Studio_Workspace" path='#[vars.filename.out.newProjectDir ++ "/src/main/resources/log4j2.xml"]'>
+			<file:content ><![CDATA[#[%dw 2.0
+import update from dw::util::Values
+output application/xml
+---
+vars.projectLog4J2 update [ "Configuration", "Loggers" ] with (
+    ( vars.sampleLog4J2.Configuration.Loggers 
+        filterObject( v, k, i ) -> 
+        	( ( v.@name startsWith  "GraphQL" ) or ( v.@name startsWith  "ODATA" ) )
+    ) ++
+    vars.projectLog4J2.Configuration.Loggers
+)]]]></file:content>
+		</file:write>
+	</sub-flow>
 </mule>
