@@ -130,7 +130,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 - NOTE: the same **run Arguments** will also be needed to run the new projects
 
-5. [OPTIONAL] Import Postman collection from **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**, and update the its collection variable to with the custom **_<schemaConnectionName\>_**
+5. [OPTIONAL] Import Postman collection from **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**, and update its collection variable with the custom **_<schemaConnectionName\>_**
 
 ### Step 2. Generate the database metadata information
 
