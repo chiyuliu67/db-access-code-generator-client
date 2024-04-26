@@ -1,4 +1,4 @@
-# **_db-access-code-generator_**
+# **_db-access-code-generator-client_**
 
 ---
 
@@ -6,9 +6,9 @@
 
 This is the client side of the overall **_MuleSoft DB Access Code Generator_** project which users will work with locally. This Code Generator project currently supports **_Oracle_**, **_MySql_**, and **_Sql Server_** assets generation.
 
-This client side project will be running in user specified environment and will connect to user's databases in order to retrieve the database information. The information retrieved is the schema information (including the Foreign Key constraints) of the tables specified by the user, which serves as the input for users to request the **_OData_** and **_GraphQL_** assets from the server side asset generation services hosted on **_Anypoint CloudHub_**. Once the generated assets are obtained, users use these assets to construct the new **_MuleSoft_** projects to provide the **_OData_** and **_GraphQL_** access interface for the databases.
+This client side project will be running in user specified environment and will connect to user's databases in order to retrieve the database information. The information retrieved is the schema information (including the Foreign Key constraints) of the tables specified by the user, which serves as the input for users to request the server side asset generator, which is hosted on **_Anypoint CloudHub_**, to generate the **_OData_** and **_GraphQL_** assets. Once the generated assets are obtained, users use these assets to construct the new **_MuleSoft_** projects to provide the **_OData_** and **_GraphQL_** access interface for the databases.
 
-To use this tool, download this client side project and import it into your **_MuleSoft Studio_**, add your custom database connection information to its property configuration, add (by copy/paste) the database connector configuration and the corresponding operation (**"_getSchema_.\<schemaConnectionName>"** sub-flow), then execute the project in any Mule Runtime (**_Studio_**, **_CloudHub_**, on-premise) that can communicate with the databases and services hosted in **_Anypoint CloudHub_**.
+To use this tool, download this client side project and import it into your **_MuleSoft Studio_**, add your custom database connection information to its property configuration, add (by copy/paste) the database connector configuration and the corresponding operation (**"_getSchema_.\<schemaConnectionName>"** sub-flow), then execute the project in any Mule Runtime (**_Studio_**, **_CloudHub_**, or on-premise) that can communicate with your custom databases and the code generator services hosted in **_Anypoint CloudHub_**.
 
 ## _Generated Assets_
 
@@ -35,9 +35,9 @@ The current generated **_OData_** code supports **_"MsSql"_**, **_"Oracle"_**, a
 
 ##### Regarding table keys
 
-The primary key, either single primary key or composite keys, should be defined for tables in the database. For tables with no primary key defined, it requires to be either fixed in the database or manually change the generated schemaInfo file before continuing.
+The primary key, either single primary key or composite keys, should be defined for tables in the database. For tables with no primary key defined, it requires to be either fixed in the database or manually change the generated schemaInfo file to mask the underline key field missing issue before continuing.
 
-This tool currently support the MSSql tables with "auto-generated" primary key column. However, the "auto-generated" primary key in Oracle and MySql are not supported yet.
+LIMITION: This tool currently support the MSSql tables with "auto-generated" primary key column. However, the "auto-generated" primary key in Oracle and MySql are not supported yet.
 
 #### _GraphQL_
 
@@ -45,7 +45,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 ## Usage
 
-### Step 1. Update _db-access-code-generator_ project for your databases
+### Step 1. Update _db-access-code-generator-client_ project for your databases and start it up
 
 1. Update **_"dev-properties.yaml"_**
 
@@ -126,11 +126,18 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 - 3. Configure the **_filename.input.postmanCollection_** to point to this exported file (relative to **_"src/main/resources"_**) in the **_dev-properties.yaml_**.
 
+4. Configure the **run Arguments** and start up the **_db-access-code-generator-client_**
+
+- NOTE: the same **run Arguments** will also be needed to run the new projects
+
+5. [OPTIONAL] Import Postman collection from **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**, and update the its collection variable to with the custom **_<schemaConnectionName\>_**
+
 ### Step 2. Generate the database metadata information
 
 - Issue a GET against the endpoint **"http://localhost:8888/schemaInfo/<schemaConnectionName\>"**
+  (operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
 
-  > It creates the assets based on the database metadata (including the foreign key definition) under the **"\<db-access-code-generator>/_generated_/\<schemaConnectionName>/_schemaInfo_"** directory, which will be used as the base for any further code generation:
+  > It creates the assets based on the database metadata (including the foreign key definition) under the **"\<db-access-code-generator-client>/_generated_/\<schemaConnectionName>/_schemaInfo_"** directory, which will be used as the base for any further code generation:
 
   - **"\<schemaConnectionName>\__schema.json_"**
 
@@ -150,7 +157,9 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 #### 3-a. Issue a GET against the **"http://localhost:8888/schemaCodeGen/odata/<schemaConnectionName\>"**
 
-> It creates the assets needed for your **_OData_** project under the **"\<db-access-code-generator>_/generated/_\<schemaConnectionName>/OData/"** directory:
+(operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
+
+> It creates the assets needed for your **_OData_** project under the **"\<db-access-code-generator-client>_/generated/_\<schemaConnectionName>/OData/"** directory:
 
 - **_"/api/"_** folder
 
@@ -203,13 +212,17 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 #### 3-b. GET **"http://localhost:8888/copy2newApp/odata/<schemaConnectionName\>"**
 
+(operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
+
 > It populates the new **_OData_** project with the generated assets, and update its pom.xml and log4j2.xml.
 
 ### Step 4. Generate the _GraphQL_ schema definition and implementation
 
 #### 4-a. GET **"http://localhost:8888/schemaCodeGen/gql/<schemaConnectionName\>"**
 
-> It creates the assets needed for your **_GraphQL_** project under the **"\<db-access-code-generator>/_generated_/\<schemaConnectionName>/_GraphQL_"** directory:
+> It creates the assets needed for your **_GraphQL_** project under the **"\<db-access-code-generator-client>/_generated_/\<schemaConnectionName>/_GraphQL_"** directory:
+
+(operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
 
 - **_"/api/"_** folder
 
@@ -258,5 +271,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
   > The **_<AsyncLogger>_** with the attribute **_name_** starts with **_GraphQL_** in this file will be used by the **_copy2newApp_** operation to update the new **_GraphQL_** pojrect **_"log4j2.xml"_** file.
 
 #### 4-b. GET **"http://localhost:8888/copy2newApp/gql/<schemaConnectionName\>"**
+
+(operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
 
 > It populates the new **_GraphQL_** project with the generated assets, and update its pom.xml and log4j2.xml

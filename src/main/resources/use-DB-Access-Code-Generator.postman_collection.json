@@ -1,0 +1,142 @@
+{
+	"info": {
+		"_postman_id": "194e43fb-697a-4f14-bed3-377b1436ac5a",
+		"name": "use-DB-Access-Code-Generator",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1757313"
+	},
+	"item": [
+		{
+			"name": "{{schemaName}}",
+			"item": [
+				{
+					"name": "schemaInfo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{db-access-code-generator-client}}/schemaInfo/ex_oracle",
+							"host": [
+								"{{db-access-code-generator-client}}"
+							],
+							"path": [
+								"schemaInfo",
+								"ex_oracle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "schemaCodeGen/odata",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{db-access-code-generator-client}}/schemaCodeGen/odata/ex_oracle",
+							"host": [
+								"{{db-access-code-generator-client}}"
+							],
+							"path": [
+								"schemaCodeGen",
+								"odata",
+								"ex_oracle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "schemaCodeGen/gql",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{db-access-code-generator-client}}/schemaCodeGen/gql/ex_oracle",
+							"host": [
+								"{{db-access-code-generator-client}}"
+							],
+							"path": [
+								"schemaCodeGen",
+								"gql",
+								"ex_oracle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "copy2newApp/odata",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{db-access-code-generator-client}}/copy2newApp/odata/ex_oracle",
+							"host": [
+								"{{db-access-code-generator-client}}"
+							],
+							"path": [
+								"copy2newApp",
+								"odata",
+								"ex_oracle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "copy2newApp/gql",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{db-access-code-generator-client}}/copy2newApp/gql/{{schemaName}}",
+							"host": [
+								"{{db-access-code-generator-client}}"
+							],
+							"path": [
+								"copy2newApp",
+								"gql",
+								"{{schemaName}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "db-access-code-generator-client",
+			"value": "http://localhost:8888\n",
+			"type": "string"
+		},
+		{
+			"key": "schemaName",
+			"value": "ex_oracle"
+		}
+	]
+}
