@@ -70,36 +70,20 @@ var newAppProjectKey = '.newApp.' ++ requestTypeKey ++ '.projectName'
 		<foreach doc:name="Copy/paste from generated to newApp src/main/resources" doc:id="571d6466-2858-477a-a677-2d0847ca109a" collection="#[payload]">
 			<choice doc:name="Choice" doc:id="bf363e36-8689-4a7f-ab60-f38c5881d138">
 				<when expression="#[!attributes.directory and !(attributes.fileName ~= 'sampleLog4J2.xml') and !(attributes.fileName ~= 'samplePOM.xml' )]">
-					<set-variable value='#[import substringAfter from dw::core::Strings&#10;---&#10;( attributes.path replace "\\" with "/" ) substringAfter( vars.targetType ++ "/" )]' doc:name="Set Variable" doc:id="babf7b01-b156-41dd-b660-7c67fd19c2ab" variableName="newProjectFilename" />
+					<set-variable value='#[import substringAfter from dw::core::Strings&#10;---&#10;( attributes.path replace "\\" with "/" ) substringAfter( vars.targetType ++ "/" )]' doc:name="Set Variable newProjectFilename" doc:id="babf7b01-b156-41dd-b660-7c67fd19c2ab" variableName="newProjectFilename" />
+					<set-variable value='#[output application/java&#10;---&#10;if ( !( attributes.fileName contains "csdl.xml" ) and ( attributes.fileName endsWith ".xml" ) )&#10;	vars.filename.out.newProjectDir ++ "/src/main/mule/" ++ vars.newProjectFilename&#10;else&#10;	vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ vars.newProjectFilename]' doc:name="Set Variable targetFilePath" doc:id="09693d2e-3316-49e4-97fd-31ad3ff71eed" variableName="targetFilePath"/>
 					<try doc:name="Try" doc:id="7232f07c-92a5-4b17-a912-69ab31e170af">
-						<file:write doc:name="Write" doc:id="ea114b5a-6c00-4ac1-8b75-7b82dd4bac88" path='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ vars.newProjectFilename]' config-ref="File_Config_NewApp_Studio_Workspace" mode="CREATE_NEW">
+						<file:write doc:name="Write" doc:id="ea114b5a-6c00-4ac1-8b75-7b82dd4bac88" path='#[vars.targetFilePath]' config-ref="File_Config_NewApp_Studio_Workspace" mode="CREATE_NEW">
 							<error-mapping sourceType="FILE:FILE_ALREADY_EXISTS" targetType="APP:AVOID_OVERWRITE" />
 						</file:write>
 						<error-handler>
 							<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="770f6a87-89c6-4441-86b7-6259c9c8d69b" type="APP:AVOID_OVERWRITE">
-								<file:write doc:name="Write" doc:id="59b667c8-c604-41ee-b23d-f1a90bafa39d" config-ref="File_Config_NewApp_Studio_Workspace" path='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ vars.newProjectFilename ++ "_AvoidOverwrite"]' />
+								<file:write doc:name="Write" doc:id="59b667c8-c604-41ee-b23d-f1a90bafa39d" config-ref="File_Config_NewApp_Studio_Workspace" path='#[vars.targetFilePath ++ "_AvoidOverwrite"]' />
 							</on-error-continue>
 						</error-handler>
 					</try>
 				</when>
 			</choice>
-		</foreach>
-		<file:list doc:name="newApp src/main/mule" doc:id="eb10af35-08d8-4500-a46a-9a59c5191420" config-ref="File_Config_NewApp_Studio_Workspace" directoryPath="#[vars.filename.out.newProjectDir ++ '/src/main/resources']" target="fileList" targetValue="#[( payload filter ! ( $.attributes.fileName ~= 'log4j2.xml' ) ) map $.attributes.fileName]">
-			<file:matcher filenamePattern="regex:\w.*\.xml$" />
-		</file:list>
-		<foreach doc:name="For Each .xml file, move to newApp src/main/mule" doc:id="7aa3b702-5adf-4193-a1b6-3ca662e2ff28" collection="#[vars.fileList]">
-			<try doc:name="Try" doc:id="923d3a74-ece8-4976-a8f3-7cda2504a7f2">
-				<file:move doc:name="Move" doc:id="83d7c39d-8619-49c7-ac3c-9698d03c41f6" config-ref="File_Config_NewApp_Studio_Workspace" sourcePath='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ payload]' targetPath='#[vars.filename.out.newProjectDir ++ "/src/main/mule/"]' createParentDirectories="false">
-					<error-mapping sourceType="FILE:FILE_ALREADY_EXISTS" targetType="APP:AVOID_OVERWRITE" />
-				</file:move>
-				<error-handler>
-					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="539d81f8-0ddd-434f-b90d-c9fb845f97b5" type="APP:AVOID_OVERWRITE">
-						<file:move doc:name="Move" doc:id="3acc3526-c3b5-4bc7-bffd-2d293065b618" config-ref="File_Config_NewApp_Studio_Workspace" sourcePath='#[vars.filename.out.newProjectDir ++ "/src/main/resources/" ++ payload]' targetPath='#[vars.filename.out.newProjectDir ++ "/src/main/mule/"]' createParentDirectories="false" renameTo='#[payload ++ "_AvoidOverwrite"]' overwrite="true">
-							<error-mapping sourceType="FILE:FILE_ALREADY_EXISTS" targetType="APP:AVOID_OVERWRITE" />
-						</file:move>
-					</on-error-continue>
-				</error-handler>
-			</try>
 		</foreach>
 	</sub-flow>
 	<sub-flow name="update_newApp_POM" doc:id="1b606bc2-6164-4a6a-8e69-7b31948d6a06" >
