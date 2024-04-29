@@ -45,6 +45,16 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 ## Usage
 
+### Step 0. Create empty assets
+
+1. Clone this project to your local.
+
+2. Use Anypoint Studio to create an empty Mule Project for the new OData application, and delete the generated default "Mule Configuration File" from the **_"<newOdataApp\>/src/main/mule"_** directory
+
+3. Use Anypoint Studio to create an empty Mule Project for the new GraphQL application, and delete the generated default "Mule Configuration File" from the **_"<newGraphQLApp\>/src/main/mule"_** directory
+
+4. [OPTIONAL]: Create an empty Postman collection and export it to a json file under **_db-access-code-generator-client/src/main/resources_** directory
+
 ### Step 1. Update _db-access-code-generator-client_ project for your databases and start it up
 
 1. Update **_"dev-properties.yaml"_**
@@ -52,6 +62,10 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
    - **_"filename.baseDir"_**
 
      - Update this field to match your directory path
+
+   - **_"filename.input.postmanCollection"_**
+
+     - [OPTIONAL]: Update this field to point to the exported Postman collection you prepared in Step 0. If leave this to the default, an empty Postman collection export with some dummy information in the "info" section will be used to generate the final one.
 
    - **_"schemaConnection"_**
 
@@ -65,6 +79,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
          > **appPort:** the default listening port the new **_OData application_** will be listening on
          > **apiVersion:** the API version number the new **_OData application_** is providing
          > **defaultPageSize:** the default page size for the new **_OData application_** > **projectName:** the Studio project name of the new OData application project
+         > **projectName:** the Studio project name of the new OData application project created in **Step 0**
        - **"default.newApp.gql"**
          > **appPort:** the default listening port the new **_GraphQL application_** will be listening on
          > **apiVersion:** the API version number the new **_GraphQL application_** is providing
@@ -72,7 +87,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
          > **[maxQueryComplexityAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum number of data fields a query can include. The value must be greater than 1.
          > **httpRequestResponseTimeout:** the HTTP timeout value when querying from the OData layer
          > **[introspectionEnabled](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#parameters):** enables schema introspection (recommand to set it to "false" for Production environment by default)
-         > **projectName:** the Studio project name of the new GraphQL application project
+         > **projectName:** the Studio project name of the new GraphQL application project created in **Step 0**
 
      - **"\<schemaConnectionName>"**
 
