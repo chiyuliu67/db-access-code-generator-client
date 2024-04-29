@@ -129,7 +129,7 @@
 	"variable": [
 		{
 			"key": "db-access-code-generator-client",
-			"value": "http://localhost:8888\n",
+			"value": "http://localhost:8888",
 			"type": "string"
 		},
 		{
