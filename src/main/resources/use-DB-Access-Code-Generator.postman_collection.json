@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "194e43fb-697a-4f14-bed3-377b1436ac5a",
+		"_postman_id": "2aeed63d-d383-4cc1-ae09-a7d90e6e778b",
 		"name": "use-DB-Access-Code-Generator",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "1757313"
@@ -15,13 +15,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{db-access-code-generator-client}}/schemaInfo/ex_oracle",
+							"raw": "{{db-access-code-generator-client}}/schemaInfo/{{schemaName}}",
 							"host": [
 								"{{db-access-code-generator-client}}"
 							],
 							"path": [
 								"schemaInfo",
-								"ex_oracle"
+								"{{schemaName}}"
 							]
 						}
 					},
@@ -33,14 +33,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{db-access-code-generator-client}}/schemaCodeGen/odata/ex_oracle",
+							"raw": "{{db-access-code-generator-client}}/schemaCodeGen/odata/{{schemaName}}",
 							"host": [
 								"{{db-access-code-generator-client}}"
 							],
 							"path": [
 								"schemaCodeGen",
 								"odata",
-								"ex_oracle"
+								"{{schemaName}}"
 							]
 						}
 					},
@@ -52,14 +52,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{db-access-code-generator-client}}/schemaCodeGen/gql/ex_oracle",
+							"raw": "{{db-access-code-generator-client}}/schemaCodeGen/gql/{{schemaName}}",
 							"host": [
 								"{{db-access-code-generator-client}}"
 							],
 							"path": [
 								"schemaCodeGen",
 								"gql",
-								"ex_oracle"
+								"{{schemaName}}"
 							]
 						}
 					},
@@ -71,14 +71,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{db-access-code-generator-client}}/copy2newApp/odata/ex_oracle",
+							"raw": "{{db-access-code-generator-client}}/copy2newApp/odata/{{schemaName}}",
 							"host": [
 								"{{db-access-code-generator-client}}"
 							],
 							"path": [
 								"copy2newApp",
 								"odata",
-								"ex_oracle"
+								"{{schemaName}}"
 							]
 						}
 					},
@@ -111,7 +111,6 @@
 			"listen": "prerequest",
 			"script": {
 				"type": "text/javascript",
-				"packages": {},
 				"exec": [
 					""
 				]
@@ -121,7 +120,6 @@
 			"listen": "test",
 			"script": {
 				"type": "text/javascript",
-				"packages": {},
 				"exec": [
 					""
 				]
@@ -136,7 +134,7 @@
 		},
 		{
 			"key": "schemaName",
-			"value": "ex_oracle"
+			"value": "ex_mssql"
 		}
 	]
 }
