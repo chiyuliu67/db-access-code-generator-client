@@ -132,6 +132,10 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 5. [OPTIONAL] Import Postman collection from **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**, and update its collection variable with the custom **_<schemaConnectionName\>_**
 
+#### NOTE before starting Step 2, 3 and 4
+
+You can import the file **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** into **Postman** to easily go through steps 2, 3 and 4 with your own **_<schemaConnectionName\>_** value assigned to the **Postman** collection variable **_"schemaName"_**
+
 ### Step 2. Generate the database metadata information
 
 - Issue a GET against the endpoint **"http://localhost:8888/schemaInfo/<schemaConnectionName\>"**
@@ -154,6 +158,8 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
     > This issue can either be fixed in database and then re-invoke the **"_/schemaInfo/_\<schemaConnectionName>"** endpoint, or temporarily modify the generated **"\<schemaConnectionName>_\_schema.json"_** in order to generate the initial implementation and then manually update the generated code to support the tables with 0 or more than 1 key columns.
 
 ### Step 3. Generate the _OData_ schema definition, REST API definition, and implementation
+
+**NOTE**: you can import the file **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** into **Postman** to help you easily go through both step 3 and 4 by assign your own **_<schemaConnectionName\>_** value to the **Postman** collection variable **_"schemaName"_**
 
 #### 3-a. Issue a GET against the **"http://localhost:8888/schemaCodeGen/odata/<schemaConnectionName\>"**
 
