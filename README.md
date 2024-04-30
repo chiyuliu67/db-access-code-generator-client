@@ -53,7 +53,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 3. Use Anypoint Studio to create an empty Mule Project for the new GraphQL application, and delete the generated default "Mule Configuration File" from the **_"<newGraphQLApp\>/src/main/mule"_** directory
 
-4. [OPTIONAL]: Create an empty Postman collection and export it to a json file under **_db-access-code-generator-client/src/main/resources_** directory
+4. [OPTIONAL]: Create an empty Postman collection and export it to a json file under **_db-access-code-generator-client/src/main/resources_** directory.
 
 ### Step 1. Update _db-access-code-generator-client_ project for your databases and start it up
 
@@ -65,7 +65,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
    - **_"filename.input.postmanCollection"_**
 
-     - [OPTIONAL]: Update this field to point to the exported Postman collection you prepared in Step 0. If leave this to the default, an empty Postman collection export with some dummy information in the "info" section will be used to generate the final one.
+     - [OPTIONAL]: If you performed the optional task in "Step 0-4", update this field to point to the exported Postman collection you prepared in Step 0. If leave this to the default, an empty Postman collection exported with some dummy information in the "info" section will be used to generate the Postman collection for you to test the new applications.
 
    - **_"schemaConnection"_**
 
@@ -121,37 +121,34 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
        - MySql: **_database_**
        - Oracle: **_serviceName_**
 
-2. Update "Schema-Info.xml"
+2. Update "global.xml" and "Schema-Info.xml"
 
-- in **_"Global Elements"_** tab
+- in "global.xml" **_"Global Elements"_** tab
 
   > Add a "Database Config" for your database based on the "schemaConnection" you put into the property file earlier.
 
-- in **_"Message Flow"_** tab
+- in "schema-Info.xml" **_"Message Flow"_** tab
 
   > Create a **"_getSchema_.\<schemaConnectionName>"** sub-flow for your database by copy/paste an arbitrary one of the 3 examples found in the flow configuration file: **_"getSchema.ex_mssql"_**, **_"getSchema.ex_mysql"_**, and **_"getSchema.ex_oracle"_**, and then change the **_"Connector configuration"_** to point to your newly created **_"Database Config"_** for your database.
 
   > **Note:** The **"\<schemaConnectionName>"** used in **_"getSchema._\<schemaConnectionName>"** as part of the sub-flow name must match the **\<schemaConnectionName>** specified in the **_"schemaConnection"_** section found in **_"dev-properties.yaml"_**.
 
-3.  Provide your own Postman exported "postman_collection.json" file to replace the default "EMPTY.postman_collection.json" (OPTIONAL)
+3. Disable those 3 example **_"Database Config"_** in **_"global.xml"_** (by comment out the corresponding lines in the XML file),
+4. Disable those 3 example **"_getSchema_.\<schemaConnectionName>"** sub-flows in **_"Schema-Info.xml"_** (by select and right click each sub-flow then select **_"Toggle Comment"_**).
 
-- 1. Create an **_empty Postman collection_** and export it to a JSON file.
+5. Configure the **Launch Arguments** (ex. add these arguments: -M-Denv=dev -M-DsecureKey=fakePassword1234 -M-Dencrypt.algorithm=AES -M-Dencrypt.mode=CBC)
 
-- 2. Copy the exported Empty Postman Collection JSON file into the project somewhere under **_"src/main/resources"_** directory.
+- NOTE: the same set of **Launch Arguments** will also be needed to run the new projects
 
-- 3. Configure the **_filename.input.postmanCollection_** to point to this exported file (relative to **_"src/main/resources"_**) in the **_dev-properties.yaml_**.
-
-4. Configure the **run Arguments** and start up the **_db-access-code-generator-client_**
-
-- NOTE: the same **run Arguments** will also be needed to run the new projects
-
-5. [OPTIONAL] Import Postman collection from **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**, and update its collection variable with the custom **_<schemaConnectionName\>_**
+6. start up the **_db-access-code-generator-client_**
 
 #### NOTE before starting Step 2, 3 and 4
 
-You can import the file **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** into **Postman** to easily go through steps 2, 3 and 4 with your own **_<schemaConnectionName\>_** value assigned to the **Postman** collection variable **_"schemaName"_**
+[**Suggstion**]: Import the file **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** into **Postman** to easily go through steps 2, 3 and 4 with your own **_<schemaConnectionName\>_** value assigned to the **Postman** collection variable **_"schemaName"_**
 
 ### Step 2. Generate the database metadata information
+
+[**Suggestion**]: Perform Step 2 in Postman by importing the **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** and assign your own **_<schemaConnectionName\>_** value to the **Postman** collection variable **_"schemaName"_**
 
 - Issue a GET against the endpoint **"http://localhost:8888/schemaInfo/<schemaConnectionName\>"**
   (operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
@@ -174,7 +171,7 @@ You can import the file **_"src/main/resources/use-DB-Access-Code-Generator.post
 
 ### Step 3. Generate the _OData_ schema definition, REST API definition, and implementation
 
-**NOTE**: you can import the file **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** into **Postman** to help you easily go through both step 3 and 4 by assign your own **_<schemaConnectionName\>_** value to the **Postman** collection variable **_"schemaName"_**
+[**Suggestion**]: Perform Step 3 in Postman by importing the **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** and assign your own **_<schemaConnectionName\>_** value to the **Postman** collection variable **_"schemaName"_**
 
 #### 3-a. Issue a GET against the **"http://localhost:8888/schemaCodeGen/odata/<schemaConnectionName\>"**
 
@@ -239,6 +236,8 @@ You can import the file **_"src/main/resources/use-DB-Access-Code-Generator.post
 
 ### Step 4. Generate the _GraphQL_ schema definition and implementation
 
+[**Suggestion**]: Perform Step 4 in Postman by importing the **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** and assign your own **_<schemaConnectionName\>_** value to the **Postman** collection variable **_"schemaName"_**
+
 #### 4-a. GET **"http://localhost:8888/schemaCodeGen/gql/<schemaConnectionName\>"**
 
 > It creates the assets needed for your **_GraphQL_** project under the **"\<db-access-code-generator-client>/_generated_/\<schemaConnectionName>/_GraphQL_"** directory:
@@ -296,3 +295,15 @@ You can import the file **_"src/main/resources/use-DB-Access-Code-Generator.post
 (operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
 
 > It populates the new **_GraphQL_** project with the generated assets, and update its pom.xml and log4j2.xml
+
+### Step 5. Start the new projects, import Postman collections, and test
+
+1. Duplicate the "Launch Configuration" out of the one for "db-access-code-generator-client" (so that the "Launch Arguments" are set correctly).
+
+2. Include the new projects into the launch application list.
+
+3. Launch the applications
+
+4. While runtime is starting up, import the Postman collection files from the "src/main/resources" in each new Project
+
+5. Run tests cases from the Postman collection once the applications start up correctly.
