@@ -35,9 +35,11 @@ The current generated **_OData_** code supports **_"MsSql"_**, **_"Oracle"_**, a
 
 ##### Regarding table keys
 
-The primary key, either single primary key or composite keys, should be defined for tables in the database. For tables with no primary key defined, it requires to be either fixed in the database or manually change the generated schemaInfo file to mask the underline key field missing issue before continuing.
+The primary key, either single column primary key or composite key, should be defined for tables in the database.
 
-LIMITION: This tool currently support the MSSql tables with "auto-generated" primary key column. However, the "auto-generated" primary key in Oracle and MySql are not supported yet.
+> [**NOTE**]: For tables with no primary key defined, it requires to be either fixed in the database or manually change the generated schemaInfo file to mask the underline key field missing issue before continuing.
+
+> [**LIMITION**]: This tool currently support the MSSql tables with "auto-generated" primary key column. However, the "auto-generated" primary key in Oracle and MySql are not supported yet.
 
 #### _GraphQL_
 
@@ -53,7 +55,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 3. Use Anypoint Studio to create an empty Mule Project for the new GraphQL application, and delete the generated default "Mule Configuration File" from the **_"<newGraphQLApp\>/src/main/mule"_** directory
 
-4. [OPTIONAL]: Create an empty Postman collection and export it to a json file under **_db-access-code-generator-client/src/main/resources_** directory.
+4. [_OPTIONAL_]: Create an empty Postman collection and export it to a json file under **_db-access-code-generator-client/src/main/resources_** directory.
 
 ### Step 1. Update _db-access-code-generator-client_ project for your databases and start it up
 
@@ -61,57 +63,74 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
    - **_"filename.baseDir"_**
 
-     - Update this field to match your directory path
+     Update this field to match your directory path
 
    - **_"filename.input.postmanCollection"_**
 
-     - [OPTIONAL]: If you performed the optional task in "Step 0-4", update this field to point to the exported Postman collection you prepared in Step 0. If leave this to the default, an empty Postman collection exported with some dummy information in the "info" section will be used to generate the Postman collection for you to test the new applications.
+     > [_OPTIONAL_]: If you performed the optional task in "Step 0-4", update this field to point to the exported Postman collection you prepared in Step 0. If leave this to the default, an empty Postman collection exported with some dummy information in the "info" section will be used to generate the Postman collection for you to test the new applications.
 
-   - **_"schemaConnection"_**
+   - **_"filename.output.base"_**
 
-     - **"default.newApp"**
+     This value is relative to the value specified in **_"filename.baseDir"_**, and it points to the location where the generated assets will be saved to before being populated into the new projects.
 
-       > This set of configuration items will be used to provide the default configuration for the new **_OData application_** and the new **_GraphQL application_** users are creating. Each of the values can be overridden at the specific **"\<schemaConnectionName>"** level.
+     > In this document, the value of this configuration is assumed to be **_"generated"_** for discussion purpose.
 
-       - **"default.Studio."**
-         > **workspace:** the file directory for the Studio Worspace where the newApps (the new OData application project and the new GraphQL project) will be worked on.
+   - **_"schemaConnection."_**
+
+     - **"default.newApp."**
+
+       > Except **"default.newApp.Studio."** section, wich is required, other configuration items under both **"default.newApp.odata."** and **"default.newApp.gql."** are the default fallback values for the **"schemaConnection.\<schemaConnectionName>.newApp."** section, and any of the them can become optional if its corresponding value is set in all **"schemaConnection.\<schemaConnectionName>.newApp."** individually.
+
+       - **"default.newApp.Studio."**
+
+         - **workspace:** it points out the new application location for the tool to populate the generated assets to
+
        - **"default.newApp.odata."**
-         > **appPort:** the default listening port the new **_OData application_** will be listening on
-         > **apiVersion:** the API version number the new **_OData application_** is providing
-         > **defaultPageSize:** the default page size for the new **_OData application_** > **projectName:** the Studio project name of the new OData application project
-         > **projectName:** the Studio project name of the new OData application project created in **Step 0**
+
+         - **appPort:** the default listening port the new **_OData application_** will be listening on
+
+         - **apiVersion:** the API version number the new **_OData application_** is providing
+
+         - **defaultPageSize:** the default page size for the new **_OData application_** > **projectName:** the Studio project name of the new OData application project
+
+         - **projectName:** the Studio project name of the new OData application project created in **Step 0**
+
        - **"default.newApp.gql"**
-         > **appPort:** the default listening port the new **_GraphQL application_** will be listening on
-         > **apiVersion:** the API version number the new **_GraphQL application_** is providing
-         > **defaultPageSize:** the default page size for the new **_GraphQL application_** > **[maxQueryDepthAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum depth a query can have. The value must be greater than 1.
-         > **[maxQueryComplexityAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum number of data fields a query can include. The value must be greater than 1.
-         > **httpRequestResponseTimeout:** the HTTP timeout value when querying from the OData layer
-         > **[introspectionEnabled](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#parameters):** enables schema introspection (recommand to set it to "false" for Production environment by default)
-         > **projectName:** the Studio project name of the new GraphQL application project created in **Step 0**
+
+         - **appPort:** the default listening port the new **_GraphQL application_** will be listening on
+
+         - **apiVersion:** the API version number the new **_GraphQL application_** is providing
+
+         - **defaultPageSize:** the default page size for the new **_GraphQL application_** > **[maxQueryDepthAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum depth a query can have. The value must be greater than 1.
+
+         - **[maxQueryComplexityAllowed](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#config):** the maximum number of data fields a query can include. The value must be greater than 1.
+
+         - **httpRequestResponseTimeout:** the HTTP timeout value when querying from the OData layer
+
+         - **[introspectionEnabled](https://docs.mulesoft.com/apikit/latest/apikit-graphql-module-reference#parameters):** enables schema introspection (recommand to set it to "false" for Production environment by default)
+
+         - **projectName:** the Studio project name of the new GraphQL application project created in **Step 0**
 
      - **"\<schemaConnectionName>"**
 
-       > Add the connection information section with its own unique **"\<schemaConnectionName>"** for your databases following the 3 examples (**_"ex_mssql"_**, **_"ex_mysql"_**, and **_"ex_oracle"_**) found in the default property file.
+       Add the connection information section with its own unique **"\<schemaConnectionName>"** for your databases following the 3 examples (**_"ex_mssql"_**, **_"ex_mysql"_**, and **_"ex_oracle"_**) found in the default property file.
 
-       > Please note that based on your database type: **_"mssql"_**, **_"mysql"_**, or **_"oracle"_**, the database identifier names are **_"databaseName"_**, **_"database"_**, and **_"serviceName"_**.
+       > Please note that based on your database type: **_"mssql"_**, **_"mysql"_**, or **_"oracle"_**, the database identifier names are **_"databaseName"_**, **_"database"_**, and **_"serviceName"_** -- they match how it is in the out of box Database Connector configuration.
 
-     - **"\<schemaConnectionName>._dbtype_"**
-
-       > This field is to specify the type of database, and the values currently supported are **_"mssql"_**, **_"mysql"_**, and **_"oracle"_**.
+       - **"\<schemaConnectionName>._dbtype_"**
+         This field is to specify the type of database, and the values currently supported are **_"mssql"_**, **_"mysql"_**, and **_"oracle"_**
 
      - **"\<schemaConnectionName>._schemaname_"**
-
-       > In the case of **_"mssql"_**, this field is not used.
+       In the case of **_"mssql"_**, this field is not used.
 
      - **"\<schemaConnectionName>._tablenames_"**
-
-       > Use this field to list all the names of the tables you'd like to have the code generator to generate the (**_OData_** and/or **_GraphQL_**) implementation code for you.
+       Use this field to list all the names of the tables you'd like to have the code generator to generate the (**_OData_** and/or **_GraphQL_**) implementation code for you.
 
        > In the case of **_"mssql"_**, the field **_"schemaname"_** is not needed, but the way to specify the name of the tables need to be **"\<schemaname>.\<tablename>"**, for example, **_"PRODUCTION.BRANDS"_**
 
      - **"\<schemaConnectionName>._password_"**
 
-       > The password field needs to be **encrypted** using a **_"secureKey"_** of your choice with the default Algorithm (**_"AES"_**) and default Mode (**_"CBC"_**) (which you are free to change). The value of the **_"secureKey"_** will also be needed at the OData/GraphQL projects runtime if you use the generated code without any modification.
+       The password field needs to be **encrypted** using a **_"secureKey"_** of your choice with the default Algorithm (**_"AES"_**) and default Mode (**_"CBC"_**) (which you are free to change). These values are needed as the launch arguments to start up your Code Generator, and will also be used as the OData/GraphQL projects launch arguments at least initially right after the new apps are created and before you modify it.
 
      - **"\<schemaConnectionName>._databaseName | database | serviceName_"** (for MsSql | MySql | Oracle)
 
@@ -125,15 +144,16 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 - in "global.xml" **_"Global Elements"_** tab
 
-  > Add a "Database Config" for your database based on the "schemaConnection" you put into the property file earlier.
+  - Add a "Database Config" for your database based on the "schemaConnection" you put into the property file earlier.
 
 - in "schema-Info.xml" **_"Message Flow"_** tab
 
-  > Create a **"_getSchema_.\<schemaConnectionName>"** sub-flow for your database by copy/paste an arbitrary one of the 3 examples found in the flow configuration file: **_"getSchema.ex_mssql"_**, **_"getSchema.ex_mysql"_**, and **_"getSchema.ex_oracle"_**, and then change the **_"Connector configuration"_** to point to your newly created **_"Database Config"_** for your database.
+  - Create a **"_getSchema_.\<schemaConnectionName>"** sub-flow for your database by copy/paste an arbitrary one of the 3 examples found in the flow configuration file: **_"getSchema.ex_mssql"_**, **_"getSchema.ex_mysql"_**, and **_"getSchema.ex_oracle"_**, and then change the **_"Connector configuration"_** to point to your newly created **_"Database Config"_** for your database.
 
   > **Note:** The **"\<schemaConnectionName>"** used in **_"getSchema._\<schemaConnectionName>"** as part of the sub-flow name must match the **\<schemaConnectionName>** specified in the **_"schemaConnection"_** section found in **_"dev-properties.yaml"_**.
 
 3. Disable those 3 example **_"Database Config"_** in **_"global.xml"_** (by comment out the corresponding lines in the XML file),
+
 4. Disable those 3 example **"_getSchema_.\<schemaConnectionName>"** sub-flows in **_"Schema-Info.xml"_** (by select and right click each sub-flow then select **_"Toggle Comment"_**).
 
 5. Configure the **Launch Arguments** (ex. add these arguments: -M-Denv=dev -M-DsecureKey=fakePassword1234 -M-Dencrypt.algorithm=AES -M-Dencrypt.mode=CBC)
@@ -142,159 +162,163 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 6. start up the **_db-access-code-generator-client_**
 
-#### NOTE before starting Step 2, 3 and 4
-
-[**Suggstion**]: Import the file **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** into **Postman** to easily go through steps 2, 3 and 4 with your own **_<schemaConnectionName\>_** value assigned to the **Postman** collection variable **_"schemaName"_**
+> #### NOTE before starting Step 2, 3 and 4
+>
+> [**Suggstion**]: Import the file **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** into **Postman** to easily go through steps 2, 3 and 4 with your own **_<schemaConnectionName\>_** value assigned to the **Postman** collection variable **_"schemaName"_**
 
 ### Step 2. Generate the database metadata information
 
-[**Suggestion**]: Perform Step 2 in Postman by importing the **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** and assign your own **_<schemaConnectionName\>_** value to the **Postman** collection variable **_"schemaName"_**
+> [**Suggestion**]: Perform Step 2 in Postman by importing the **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** to **Postman** and assign your own **_<schemaConnectionName\>_** value to its collection variable **_"schemaName"_**
 
 - Issue a GET against the endpoint **"http://localhost:8888/schemaInfo/<schemaConnectionName\>"**
-  (operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
 
-  > It creates the assets based on the database metadata (including the foreign key definition) under the **"\<db-access-code-generator-client>/_generated_/\<schemaConnectionName>/_schemaInfo_"** directory, which will be used as the base for any further code generation:
+> (operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
 
-  - **"\<schemaConnectionName>\__schema.json_"**
+It creates the assets based on the database metadata (including the foreign key definition) under the **"\<db-access-code-generator-client>/_generated_/\<schemaConnectionName>/_schemaInfo_"** directory, which will be used as the base for any further code generation.
 
-    > This file contains the metadata of tables listed for the **\<schemaConnectionName>** in the **\*"schemaConnection"** section found in the property file.
+Here are the assets generated in this step:
 
-  - **"\<schemaConnectionName>_\_NavigationReference.json_"**
+- **"\<schemaConnectionName>\__schema.json_"**
 
-    > This file describes the relationships among tables. It contains both the foreign key lookup relationship defined for each table, and the reversed foreign key lookup from other partner tables.
+  This file contains the metadata of tables listed for the **\<schemaConnectionName>** in the **\*"schemaConnection"** section found in the property file.
 
-  - **"_WARNING/keyColumnCount\_\_\<N>\_\<tableName>_\_noContent.txt\_"**
+- **"\<schemaConnectionName>_\_NavigationReference.json_"**
 
-    > This type of files has empty content and is trying to use its filename to notify the users that there exists tables of which the key column count is not exactly 1. If the key column count is 0, then it must be fixed before start generating the implementation code because currently this code generator program only supports tables with a single key column.
+  This file describes the relationships among tables. It contains both the foreign key lookup relationship defined for each table, and the reversed foreign key lookup from other partner tables.
 
-    > This issue can either be fixed in database and then re-invoke the **"_/schemaInfo/_\<schemaConnectionName>"** endpoint, or temporarily modify the generated **"\<schemaConnectionName>_\_schema.json"_** in order to generate the initial implementation and then manually update the generated code to support the tables with 0 or more than 1 key columns.
+- **"_WARNING/keyColumnCount\_\_\<N>\_\<tableName>_\_noContent.txt\_"**
+
+  This type of files has empty content and is trying to use its filename to notify the users that there exists tables of which the key column count is not exactly 1 (indicated by **\_\_\_\<N>\_\_**). If the key column count is 0, then it must be fixed before start generating the implementation code; and if the count is greater than 1, it's just to confirm to the user that a composite key is used for the table.
+
+  > This issue can either be fixed in database and then re-invoke the **"_/schemaInfo/_\<schemaConnectionName>"** endpoint, or temporarily modify the generated **"\<schemaConnectionName>_\_schema.json"_** in order to continue.
 
 ### Step 3. Generate the _OData_ schema definition, REST API definition, and implementation
 
-[**Suggestion**]: Perform Step 3 in Postman by importing the **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** and assign your own **_<schemaConnectionName\>_** value to the **Postman** collection variable **_"schemaName"_**
+> [**Suggestion**]: Perform Step 3 in Postman by importing the **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** to **Postman** and assign your own **_<schemaConnectionName\>_** value to its collection variable **_"schemaName"_**
 
 #### 3-a. Issue a GET against the **"http://localhost:8888/schemaCodeGen/odata/<schemaConnectionName\>"**
 
-(operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
+> (operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
 
-> It creates the assets needed for your **_OData_** project under the **"\<db-access-code-generator-client>_/generated/_\<schemaConnectionName>/OData/"** directory:
+It creates the assets needed for your **_OData_** project under the **"\<db-access-code-generator-client>_/generated/_\<schemaConnectionName>/OData/"** directory:
 
 - **_"/api/"_** folder
 
-  > The new **_OData_** project needs this folder under **_"src/main/resources"_**.
+  This will be placed under **_"src/main/resources"_** in the new **_OData_** project.
 
-  > This folder contains the **_CSDL_** file required by **_"APIKit for OData"_** and the **_RAML_** files define the **_OData_** REST API.
+  This folder contains the **_CSDL_** file required by **_"APIKit for OData"_** and the **_RAML_** files define the **_OData_** REST API.
 
 - **_"/dw4Odata/"_** folder
 
-  > The new **_OData_** project needs this folder under **_"src/main/resources"_**.
+  This will be placed under **_"src/main/resources"_** in the new **_OData_** project.
+
+  It contains the dataweave files required by the new **_OData_** project.
 
 - **"\<schemaConnectionName>_\_OData.xml_"**
 
-  > The new **_OData_** project needs this file under **_"src/main/mule"_**.
+  This will be placed under **_"src/main/mule"_** in the new **_OData_** project.
 
-  > This is the main **_OData_** implementation file.
+  This is the main **_OData_** implementation file.
 
 - **_"global.xml"_**
 
-  > The new **_OData_** project needs this file under **_"src/main/mule"_**.
+  This will be placed under **_"src/main/mule"_** in the new **_OData_** project.
 
-  > This file contains the **_"Global Elements"_** needed for your **_OData_** project.
+  This file contains the **_"Global Elements"_** needed for your **_OData_** project.
 
-- **"\<schemaConnectionName>_\_properties.yaml_"**
+- **"dev-properties.yaml\_"**
 
-  > The new **_OData_** project needs this file under **_"src/main/resources"_**.
+  This will be placed under **_"src/main/resources"_** in the new **_OData_** project.
 
-  > This file contains all the required properties required by the generated **_OData_** implementation.
+  This file contains the configuration properties needed for the new **_OData_** project.
 
-- **"\<schemaConnectionName>_\_postman.json_"**
+- **"\<schemaConnectionName>\_odata.postman*collection.json*"**
 
-  > Import this file into Postman to test the generated code.
+  This will be placed under **_"src/main/resources"_** in the new **_OData_** project.
 
-  > This file is built out of the empty postman file specified by the configuration value of **_filename.input.postmanCollection_** found in **_"dev-properties.yaml"_**.
+  Import this file into Postman to test the generated code.
 
-  > The generated **_Postman_** element is to help the users to test the **_"$expand"_** on all objects.
+  This file is built out of the empty postman file specified by the configuration value of **_filename.input.postmanCollection_** found in the code generator project **_"dev-properties.yaml"_**.
+
+  The generated **_Postman_** element is to help the users to test the queries on all objects, including ENTITY, ENTITY\*COLLECTION, and all the available \*\*\*"$expand"\_\*\*.
 
 - **_"samplePOM.xml"_**
 
-  > The **_<build>_** and the **_<dependencies>_** elements in this file will be used by the **_copy2newApp_** operation to update the new **_OData_** pojrect **_"pom.xml"_** file.
+  The **_\<build\>_** and the **_\<dependencies\>_** elements in this file will be used by the **_copy2newApp_** operation to update the new **_OData_** pojrect **_"pom.xml"_** file.
 
 - **_"sampleLog4J2.xml"_**
 
-  > The **_<AsyncLogger>_** with the attribute **_name_** starts with **_ODATA_** in this file will be used by the **_copy2newApp_** operation to update the new **_OData_** pojrect **_"log4j2.xml"_** file.
-
-- Current version generates the codes support the following:
-
-  - Tables with Composite Key
-  - **_mssql_** with **_auto-generated_** ID column (but currently doesn't support the auto-generated ID in **_"oracle"_** and **_"mysql"_** yet)
+  The **_\<AsyncLogger\>_** with the attribute **_name_** starts with **_ODATA_** in this file will be used by the **_copy2newApp_** operation to update the new **_OData_** pojrect **_"log4j2.xml"_** file.
 
 #### 3-b. GET **"http://localhost:8888/copy2newApp/odata/<schemaConnectionName\>"**
 
-(operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
+> (operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
 
-> It populates the new **_OData_** project with the generated assets, and update its pom.xml and log4j2.xml.
+It populates the new **_OData_** project with the generated assets, and update its pom.xml and log4j2.xml.
 
 ### Step 4. Generate the _GraphQL_ schema definition and implementation
 
-[**Suggestion**]: Perform Step 4 in Postman by importing the **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** and assign your own **_<schemaConnectionName\>_** value to the **Postman** collection variable **_"schemaName"_**
+> [**Suggestion**]: Perform Step 4 in Postman by importing the **_"src/main/resources/use-DB-Access-Code-Generator.postman_collection.json"_** to **Postman** and assign your own **_<schemaConnectionName\>_** value to its collection variable **_"schemaName"_**
 
 #### 4-a. GET **"http://localhost:8888/schemaCodeGen/gql/<schemaConnectionName\>"**
 
-> It creates the assets needed for your **_GraphQL_** project under the **"\<db-access-code-generator-client>/_generated_/\<schemaConnectionName>/_GraphQL_"** directory:
+> (operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
 
-(operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
+It creates the assets needed for your **_GraphQL_** project under the **"\<db-access-code-generator-client>/_generated_/\<schemaConnectionName>/_GraphQL_"** directory:
 
 - **_"/api/"_** folder
 
-  > The new **_GraphQL_** project needs this folder under **_"src/main/resources"_**.
+  This will be placed under **_"src/main/resources"_** in the new **_GraphQL_** project.
 
-  > This folder contains the **_"<schemaConnectionName>.graphql"_** file required by **_"APIKit for GraphQL"_**.
+  This folder contains the **_"<schemaConnectionName>.graphql"_** file which is required by the **_"APIKit for GraphQL"_**.
 
 - **_"/dw4gql/"_** folder
 
-  The new **_GraphQL_** project needs this folder under **_"src/main/resources"_**.
+  This will be placed under **_"src/main/resources"_** in the new **_GraphQL_** project.
+
+  It contains the dataweave files required by the new **_GraphQL_** project.
 
 - **"\<schemaConnectionName>_\_GraphQL.xml_"**
 
-  > The new **_GraphQL_** project needs this file under **_"src/main/mule"_**.
+  This will be placed under **_"src/main/mule"_** in the new **_GraphQL_** project.
 
-  > This is the main **_GraphQL_** implementation file.
-
-  > After past the file into your new **_GraphQL_** project, it is suggested to open it in the **_"COnfiguration XML"_** tab and perform a "select all"/"copy"/"past" the XML content to trigger Studio to generate new **_"doc:it"_** for all elements.
+  This is the main **_GraphQL_** implementation file.
 
 - **"\<schemaConnectionName>_\_global.xml_"**
 
-  > The new **_GraphQL_** project needs this file under **_"src/main/mule"_**.
+  This will be placed under **_"src/main/mule"_** in the new **_GraphQL_** project.
 
-  > This file contains the **_"Global Elements"_** needed for your **_GraphQL_** project.
+  This file contains the **_"Global Elements"_** needed for your **_GraphQL_** project.
 
-- **"_dev-_\<schemaConnectionName>_-properties.yaml_**
+- **"_dev-properties.yaml_**
 
-  > The new **_GraphQL_** project needs this file under **_"src/main/resources"_**.
+  This will be placed under **_"src/main/resources"_** in the new **_GraphQL_** project.
 
-  > This file contains all the required properties required by the generated **_GraphQL_** implementation.
+  This file contains the configuration properties needed for the new **_GraphQL_** project.
 
-- **"\<schemaConnectionName>_\_gqlPostman.json_"**
+- **_"\<schemaConnectionName>\_gql.postman_collection.json"_**
 
-  > Import this file into Postman to test the generated code.
+  This will be placed under **_"src/main/resources"_** in the new **_GraphQL_** project.
 
-  > This file is built out of the empty postman file specified by the configuration value of **_filename.input.postmanCollection_** found in **_"dev-properties.yaml"_**.
+  Import this file into Postman to test the generated code.
 
-  > The generated **_Postman_** element is to help the users to test the linked objects on all objects.
+  This file is built out of the empty postman file specified by the configuration value of **_filename.input.postmanCollection_** found in code generator project **_"dev-properties.yaml"_**.
+
+  The generated **_Postman_** element is to help the users to test the queries on all objects with their linked objects.
 
 - **_"samplePOM.xml"_**
 
-  > The **_<build>_** and the **_<dependencies>_** elements in this file will be used by the **_copy2newApp_** operation to update the new **_GraphQL_** pojrect **_"pom.xml"_** file.
+  The **_\<build\>_** and the **_\<dependencies\>_** elements in this file will be used by the **_copy2newApp_** operation to update the new **_GraphQL_** pojrect **_"pom.xml"_** file.
 
 - **_"sampleLog4J2.xml"_**
 
-  > The **_<AsyncLogger>_** with the attribute **_name_** starts with **_GraphQL_** in this file will be used by the **_copy2newApp_** operation to update the new **_GraphQL_** pojrect **_"log4j2.xml"_** file.
+  The **_\<AsyncLogger\>_** with the attribute **_name_** starts with **_GraphQL_** in this file will be used by the **_copy2newApp_** operation to update the new **_GraphQL_** pojrect **_"log4j2.xml"_** file.
 
 #### 4-b. GET **"http://localhost:8888/copy2newApp/gql/<schemaConnectionName\>"**
 
-(operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
+> (operation is available in **_src/main/resources/use-DB-Access-Code-Generator.postman_collection.json_**)
 
-> It populates the new **_GraphQL_** project with the generated assets, and update its pom.xml and log4j2.xml
+It populates the new **_GraphQL_** project with the generated assets, and update its pom.xml and log4j2.xml
 
 ### Step 5. Start the new projects, import Postman collections, and test
 
