@@ -4,7 +4,7 @@
 
 ## Overview
 
-This is the client side of the overall **_MuleSoft DB Access Code Generator_** project which users will work with locally. This Code Generator project currently supports **_Oracle_**, **_MySql_**, and **_Sql Server_** assets generation.
+This is the client side of the overall **_MuleSoft DB Access Code Generator_** project which users will work with locally. This Code Generator project currently supports **_Oracle_**, **_MySql_**, **_Sql Server_**, and **_Postgres_** assets generation.
 
 This client side project will be running in user specified environment and will connect to user's databases in order to retrieve the database information. The information retrieved is the schema information (including the Foreign Key constraints) of the tables specified by the user, which serves as the input for users to request the server side asset generator, which is hosted on **_Anypoint CloudHub_**, to generate the **_OData_** and **_GraphQL_** assets. Once the generated assets are obtained, users use these assets to construct the new **_MuleSoft_** projects to provide the **_OData_** and **_GraphQL_** access interface for the databases.
 
@@ -24,7 +24,7 @@ The generated assets include the following:
 
 #### _OData_
 
-The current generated **_OData_** code supports **_"MsSql"_**, **_"Oracle"_**, and **_"MySql"_** with the following **_REST_** operation:
+The current generated **_OData_** code supports **_"MsSql"_**, **_"Oracle"_**, **_"MySql"_**, and **_Postgres_** with the following **_REST_** operation:
 
 - **_GET COLLECTION_** (support **_\$top_**, **_\$skip_**, **_\$orderby_**, **_\$select_**, **_\$count_**, **_\$filter_**, **_\$expand_**, and **_nested \$expand_**)
 - **_POST COLLECTION_** (though it is accepting one record at a time, it is catagorized to COLLECTION because it doesn't take the ENTITY ID as the URI Param)
@@ -39,7 +39,7 @@ The primary key, either single column primary key or composite key, should be de
 
 > [**NOTE**]: For tables with no primary key defined, it requires to be either fixed in the database or manually change the generated schemaInfo file to mask the underline key field missing issue before continuing.
 
-> [**LIMITION**]: This tool currently support the MSSql tables with "auto-generated" primary key column. However, the "auto-generated" primary key in Oracle and MySql are not supported yet.
+> [**LIMITION**]: This tool currently support the MSSql tables with "auto-generated" primary key column. However, the "auto-generated" primary key in Oracle, MySql, and Postgres have not been fully tested yet.
 
 #### _GraphQL_
 
@@ -113,12 +113,12 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
      - **"\<schemaConnectionName>"**
 
-       Add the connection information section with its own unique **"\<schemaConnectionName>"** for your databases following the 3 examples (**_"ex_mssql"_**, **_"ex_mysql"_**, and **_"ex_oracle"_**) found in the default property file.
+       Add the connection information section with its own unique **"\<schemaConnectionName>"** for your databases following the 3 examples (**_"ex_mssql"_**, **_"ex_mysql"_**, **_"ex_oracle"_**, and **_"ex_postgres"_**) found in the default property file.
 
-       > Please note that based on your database type: **_"mssql"_**, **_"mysql"_**, or **_"oracle"_**, the database identifier names are **_"databaseName"_**, **_"database"_**, and **_"serviceName"_** -- they match how it is in the out of box Database Connector configuration.
+       > Please note that based on your database type: **_"mssql"_**, **_"mysql"_**, **_"oracle"_**, or **_"postgres"_** the database identifier names are **_"databaseName"_**, **_"database"_**, and **_"serviceName"_** -- they match how it is in the out of box Database Connector configuration.
 
        - **"\<schemaConnectionName>._dbtype_"**
-         This field is to specify the type of database, and the values currently supported are **_"mssql"_**, **_"mysql"_**, and **_"oracle"_**
+         This field is to specify the type of database, and the values currently supported are **_"mssql"_**, **_"mysql"_**, **_"oracle"_**, and **_"postgres"_**
 
      - **"\<schemaConnectionName>._schemaname_"**
        In the case of **_"mssql"_**, this field is not used.
@@ -132,7 +132,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
        The password field needs to be **encrypted** using a **_"secureKey"_** of your choice with the default Algorithm (**_"AES"_**) and default Mode (**_"CBC"_**) (which you are free to change). These values are needed as the launch arguments to start up your Code Generator, and will also be used as the OData/GraphQL projects launch arguments at least initially right after the new apps are created and before you modify it.
 
-     - **"\<schemaConnectionName>._databaseName | database | serviceName_"** (for MsSql | MySql | Oracle)
+     - **"\<schemaConnectionName>._databaseName | database | serviceName_"** (for MsSql | MySql | Oracle | Postgres)
 
        > Specify the database name or the database service name according to the database type as following:
 
@@ -148,7 +148,7 @@ Currently this tool only generates code to support **_GraphQL Query_** but not *
 
 - in "schema-Info.xml" **_"Message Flow"_** tab
 
-  - Create a **"_getSchema_.\<schemaConnectionName>"** sub-flow for your database by copy/paste an arbitrary one of the 3 examples found in the flow configuration file: **_"getSchema.ex_mssql"_**, **_"getSchema.ex_mysql"_**, and **_"getSchema.ex_oracle"_**, and then change the **_"Connector configuration"_** to point to your newly created **_"Database Config"_** for your database.
+  - Create a **"_getSchema_.\<schemaConnectionName>"** sub-flow for your database by copy/paste an arbitrary one of the 3 examples found in the flow configuration file: **_"getSchema.ex_mssql"_**, **_"getSchema.ex_mysql"_**, **_"getSchema.ex_oracle"_**, and **_"getSchema.ex_postgres"_**, and then change the **_"Connector configuration"_** to point to your newly created **_"Database Config"_** for your database.
 
   > **Note:** The **"\<schemaConnectionName>"** used in **_"getSchema._\<schemaConnectionName>"** as part of the sub-flow name must match the **\<schemaConnectionName>** specified in the **_"schemaConnection"_** section found in **_"dev-properties.yaml"_**.
 
