@@ -2,12 +2,11 @@
 
 <mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
 	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-	xmlns:file="http://www.mulesoft.org/schema/mule/file"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" 
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
 http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd 
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -43,5 +42,8 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 			<reconnection />
 		</file:connection>
 	</file:config>
+	<db:config name="Database_Config_EX_Postgres" doc:name="Database Config" doc:id="0e04b59d-28bd-480d-a72b-adf5ebc9ca81" >
+		<db:generic-connection url="jdbc:postgresql://${schemaConnection.ex_postgres.host}:${schemaConnection.ex_postgres.port}/${schemaConnection.ex_postgres.database}" driverClassName="${schemaConnection.ex_postgres.driverClassName}" user="${schemaConnection.ex_postgres.username}" password="${secure::schemaConnection.ex_postgres.password}" />
+	</db:config>
 
 </mule>

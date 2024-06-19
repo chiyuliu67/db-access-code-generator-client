@@ -73,3 +73,22 @@ schemaConnection:
     username: 'username'
     password: '![rowZ8nB7SxP1mSSAXtLK3Q==]'
     database: 'someMySqlDatbase'
+  ex_postgres:
+    newApp:
+      odata:
+        appPort: '6063'
+        apiVersion: '1'
+        projectName: 'test-ex_postgres-odata'
+      gql:
+        appPort: '7074'
+        apiVersion: '1'
+        projectName: 'test-ex_postgres-gql'
+    dbtype: 'postgres'
+    schemaname: 'bookings'
+    tablenames: 'ticket_flights, boarding_passes, aircrafts_data, flights, airports_data, seats, tickets, bookings'
+    host: 'local-vm-rocky'
+    port: '5432'
+    username: 'username'
+    password: '![rowZ8nB7SxP1mSSAXtLK3Q==]'
+    database: 'somePostgresDatabase'
+    driverClassName: 'org.postgresql.Driver'

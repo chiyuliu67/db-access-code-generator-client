@@ -115,4 +115,9 @@ output application/json
 	
 
 </sub-flow>
+	<sub-flow name="odata.writeProperty.postgres" doc:id="2b8d0c04-9003-40b3-9259-ae9875e623c6">
+		<set-variable value="#[%dw 2.0&#10;import config_schemaConnection_newApp from dwUtils::newAppConfig&#10;output text/plain&#10;var propertyConfig = &#10;&quot;app:&#10;  port: '##newOdataAppPort'&#10;  path: '/odata/##schemaConnection/v##odataApiVersion/*'&#10;schemaConnection:&#10;  ##schemaConnection:&#10;    host: '##host'&#10;    port: '##port'&#10;    username: '##username'&#10;    password: '##password'&#10;    database: '##database'&#10;    driverClassName: '##driverClassName'&#10;odata:&#10;  defaultPageSize: '##defaultPageSize'&#10;&quot;&#10;---&#10;( propertyConfig &#10;	replace '##schemaConnection' with vars.schema&#10;	replace '##newOdataAppPort' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.appPort&quot;, &quot;8881&quot; ) )&#10;	replace '##odataApiVersion' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.apiVersion&quot;, &quot;11&quot; ) )&#10;	replace '##defaultPageSize' with ( config_schemaConnection_newApp( p, vars.schema, &quot;.odata.defaultPageSize&quot;, &quot;50&quot; ) )&#10;	replace '##host' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.host&quot; )&#10;	replace '##port' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.port&quot; )&#10;	replace '##username' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.username&quot; )&#10;	replace '##password' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.password&quot; )&#10;	replace '##database' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.database&quot; )&#10;	replace '##driverClassName' with p( 'schemaConnection.' ++ vars.schema ++ &quot;.driverClassName&quot; )&#10;)]" doc:name="Set Variable properties" doc:id="ddcdfee2-c357-45d3-b786-104ae1f0e81d" variableName="properties"/>
+	
+
+</sub-flow>
 </mule>

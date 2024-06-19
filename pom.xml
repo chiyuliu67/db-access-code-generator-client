@@ -39,6 +39,10 @@
 							<groupId>mysql</groupId>
 							<artifactId>mysql-connector-java</artifactId>
 						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.postgresql</groupId>
+							<artifactId>postgresql</artifactId>
+						</sharedLibrary>
 					</sharedLibraries>
 				</configuration>
 			</plugin>
@@ -95,6 +99,11 @@
 			<artifactId>mule-file-connector</artifactId>
 			<version>1.5.2</version>
 			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.7.3</version>
 		</dependency>
 	</dependencies>
 	<repositories>

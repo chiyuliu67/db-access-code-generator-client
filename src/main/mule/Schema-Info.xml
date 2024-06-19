@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
-	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-	xmlns:file="http://www.mulesoft.org/schema/mule/file" 
+<mule xmlns:snowflake="http://www.mulesoft.org/schema/mule/snowflake"
+	xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls" 
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
 	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
-	xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
 http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd">
+http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd
+http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mule/snowflake/current/mule-snowflake.xsd">
 	<flow name="Schema-InfoFlow" doc:id="a17038c1-0154-4850-96d7-1b6d6b181f11" >
 		<http:listener doc:name="Listener" doc:id="4d6913db-ed36-431e-b014-e620f8e48fb2" config-ref="HTTP_Listener_config" path="/schemaInfo/{schemaConnection}"/>
 		<set-variable value="#[attributes.uriParams.schemaConnection]" doc:name="Set Variable" doc:id="dc0b30cd-e6e5-49f8-8a4f-550a082f3847" variableName="schemaConnection"/>
@@ -102,7 +103,25 @@ output application/json
 	tableName: vars.tablePointer.tableName
 }]]]></db:input-parameters>
 		</db:select>
-		<db:select doc:name="getSchema" doc:id="5c71e451-114e-4035-b836-cc12b68513a9" config-ref="Database_Config_EX_Oracle">
+		<db:select doc:name="getSchema" doc:id="5c71e451-114e-4035-b836-cc12b68513a9" config-ref="Database_Config_EX_Postgres">
+						<db:sql><![CDATA[#[ vars.request.schemaQuery as String ]]]></db:sql>
+						<db:input-parameters><![CDATA[#[{
+	schemaName: vars.tablePointer.schemaName,
+	tableName: vars.tablePointer.tableName
+}]]]></db:input-parameters>
+					</db:select>
+	
+</sub-flow>
+	<sub-flow name="getSchema.ex_postgres" doc:id="1bd6e135-7dff-4904-8ad1-3fbf6a67f967" >
+		<db:select doc:name="getFK" doc:id="b1f07cea-701a-4fda-9131-c90242536dda" config-ref="Database_Config_EX_Postgres" target="fkInfo">
+			<db:sql ><![CDATA[#[ vars.request.fkQuery as String ]]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	schemaName: vars.tablePointer.schemaName,
+	tableName: vars.tablePointer.tableName
+}]]]></db:input-parameters>
+		</db:select>
+		<set-variable value="#[vars.fkInfo map( e, i ) -&gt; do {&#10;	var fkRef = flatten( e.pg_get_constraintdef scan( /.*FOREIGN KEY\s*\((.*)\)\s*REFERENCES\s*(.*)\((.*)\)/ ) )[1 to -1]&#10;	---&#10;	{&#10;	  constraint_name: e.foreign_key,&#10;	  table_name: e.table_name as String,&#10;	  constraint_column_name: fkRef[ 0 ],&#10;	  referenced_object: fkRef[ 1 ],&#10;	  referenced_column_name: fkRef[ 2 ],&#10;	  entity_only: 'true'&#10;	}&#10;}]" doc:name="Set Variable" doc:id="594dd820-527d-4eb7-8b0f-08fe98d61e40" variableName="fkInfo"/>
+		<db:select doc:name="getSchema" doc:id="ae2017ec-1fd9-4b45-9aa9-264bdb81535a" config-ref="Database_Config_EX_Postgres">
 						<db:sql><![CDATA[#[ vars.request.schemaQuery as String ]]]></db:sql>
 						<db:input-parameters><![CDATA[#[{
 	schemaName: vars.tablePointer.schemaName,
