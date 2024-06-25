@@ -14,19 +14,19 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
 http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd
 http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mule/snowflake/current/mule-snowflake.xsd">
-	<flow name="Schema-InfoFlow" doc:id="a17038c1-0154-4850-96d7-1b6d6b181f11" >
-		<http:listener doc:name="Listener" doc:id="4d6913db-ed36-431e-b014-e620f8e48fb2" config-ref="HTTP_Listener_config" path="/schemaInfo/{schemaConnection}"/>
-		<set-variable value="#[attributes.uriParams.schemaConnection]" doc:name="Set Variable" doc:id="dc0b30cd-e6e5-49f8-8a4f-550a082f3847" variableName="schemaConnection"/>
-		<http:request method="GET" doc:name="Request sql" doc:id="586bb41f-2068-4b5d-a676-c1f403674155" config-ref="HTTP_Request_configuration" path='#["/schemaInfoSql/" ++ p( "schemaConnection." ++ attributes.uriParams.schemaConnection ++ ".dbtype" )]'>
+                                                                                                                 	<flow name="Schema-InfoFlow" doc:id="d1dac300-b2d1-4e9c-8b10-864913f28abe" >
+		<http:listener doc:name="Listener" doc:id="facce545-7167-4b03-8304-d01ed4a851ed" config-ref="HTTP_Listener_config" path="/schemaInfo/{schemaConnection}"/>
+		<set-variable value="#[attributes.uriParams.schemaConnection]" doc:name="Set Variable" doc:id="1d3ad0bf-d95f-40fc-bc42-b3247a17c242" variableName="schemaConnection"/>
+		<http:request method="GET" doc:name="Request sql" doc:id="66339b91-8263-468b-a566-588d70c17393" config-ref="HTTP_Request_configuration" path='#["/schemaInfoSql/" ++ p( "schemaConnection." ++ attributes.uriParams.schemaConnection ++ ".dbtype" )]'>
 		</http:request>
-		<set-variable value="#[%dw 2.0&#10;output application/java&#10;var propertyRoot = 'schemaConnection.' ++ vars.schemaConnection ++ &quot;.&quot;&#10;---&#10;{&#10;	connection: vars.schemaConnection,&#10;	dbtype: p( propertyRoot ++ &quot;dbtype&quot; ),&#10;	schemaName: p( propertyRoot ++ &quot;schemaname&quot; ),&#10;	configuredTableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) -&gt; trim( e ),&#10;	tableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) &#10;		-&gt; trim( if ( e contains( &quot;.&quot; ) ) ( e splitBy( &quot;.&quot; ) )[ 1 ] else e ),&#10;	schemaQuery: payload.schemaQuery,&#10;	fkQuery: payload.fkQuery&#10;}]" doc:name="Set Variable request" doc:id="9b2b58b2-7957-4dd5-9c29-b9a3d58cf3ce" variableName="request" />
-		<foreach doc:name="For Each vars.request.configuredTableNames" doc:id="479296eb-8b19-402d-bc13-cfc866bcfebd" collection="#[vars.request.configuredTableNames]" >
-			<set-variable value='#[if ( payload contains( "." ) )&#10;	{&#10;		schemaName: ( payload splitBy( "." ) )[ 0 ],&#10;		tableName: ( payload splitBy( "." ) )[ 1 ]&#10;	}&#10;else&#10;	{&#10;		schemaName: vars.request.schemaName,&#10;		tableName: payload&#10;	}]' doc:name="Set Variable tablePointer" doc:id="982c37ea-e01b-46ef-a7b4-499c4b7b49bd" variableName="tablePointer" />
-			<flow-ref doc:name="getSchema" doc:id="cc38d7fd-5ae8-4347-b81d-2e0d5b389c1f" name='#["getSchema." ++ vars.request.connection]' />
-			<set-variable value="#[vars.fkInfo map( e, i ) -&gt; &#10;	( e mapObject( v, k, j ) -&gt; &#10;		{ ( lower( k ) ): v }&#10;	)]" doc:name="Set Variable fkInfo" doc:id="8c32dfb9-6efa-41ed-ae78-14a01c3880d4" variableName="fkInfo"/>
-			<set-variable doc:name="Set Variable dbSchemaInfo" doc:id="46f62b6e-5d3b-478f-9481-d92e01a052a5" variableName="dbSchemaInfo" value="#[%dw 2.0&#10;output application/json&#10;---&#10;( vars.dbSchemaInfo default [] ) &lt;&lt;&#10;(&#10;	vars.tablePointer ++ 	&#10;	{&#10;		fkInfo: vars.fkInfo,&#10;		schemaInfo: payload&#10;	}&#10;)]"/>
+		<set-variable value="#[%dw 2.0&#10;output application/java&#10;var propertyRoot = 'schemaConnection.' ++ vars.schemaConnection ++ &quot;.&quot;&#10;---&#10;{&#10;	connection: vars.schemaConnection,&#10;	dbtype: p( propertyRoot ++ &quot;dbtype&quot; ),&#10;	schemaName: p( propertyRoot ++ &quot;schemaname&quot; ),&#10;	configuredTableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) -&gt; trim( e ),&#10;	tableNames: p( propertyRoot ++ &quot;tablenames&quot; ) splitBy /,/ map( e, i ) &#10;		-&gt; trim( if ( e contains( &quot;.&quot; ) ) ( e splitBy( &quot;.&quot; ) )[ 1 ] else e ),&#10;	schemaQuery: payload.schemaQuery,&#10;	fkQuery: payload.fkQuery&#10;}]" doc:name="Set Variable request" doc:id="b21c8afe-2d17-4fc7-b1ff-0746cbbadaf6" variableName="request" />
+		<foreach doc:name="For Each vars.request.configuredTableNames" doc:id="dc1549fb-70ef-45a5-b692-79c7f83158c7" collection="#[vars.request.configuredTableNames]" >
+			<set-variable value='#[if ( payload contains( "." ) )&#10;	{&#10;		schemaName: ( payload splitBy( "." ) )[ 0 ],&#10;		tableName: ( payload splitBy( "." ) )[ 1 ]&#10;	}&#10;else&#10;	{&#10;		schemaName: vars.request.schemaName,&#10;		tableName: payload&#10;	}]' doc:name="Set Variable tablePointer" doc:id="61737224-7081-4a51-ad5e-5032e672e8a2" variableName="tablePointer" />
+			<flow-ref doc:name="getSchema" doc:id="0bd97666-947d-4a83-a895-18747b1ba298" name='#["getSchema." ++ vars.request.connection]' />
+			<set-variable value="#[vars.fkInfo map( e, i ) -&gt; &#10;	( e mapObject( v, k, j ) -&gt; &#10;		{ ( lower( k ) ): v }&#10;	)]" doc:name="Set Variable fkInfo" doc:id="de2abedc-01bd-4faf-90e6-93ea5e4b9c8c" variableName="fkInfo"/>
+			<set-variable doc:name="Set Variable dbSchemaInfo" doc:id="4a194cf6-2afd-479d-8a7d-a7eaf5177141" variableName="dbSchemaInfo" value="#[%dw 2.0&#10;output application/json&#10;---&#10;( vars.dbSchemaInfo default [] ) &lt;&lt;&#10;(&#10;	vars.tablePointer ++ 	&#10;	{&#10;		fkInfo: vars.fkInfo,&#10;		schemaInfo: payload&#10;	}&#10;)]"/>
 		</foreach>
-		<http:request method="POST" doc:name="Request" doc:id="77315069-9ef7-4adc-b1b5-fe391b1e58e2" config-ref="HTTP_Request_configuration" path='#["/schemaInfo"]'>
+		<http:request method="POST" doc:name="Request" doc:id="a42fff49-60db-4c55-be81-85c1de575681" config-ref="HTTP_Request_configuration" path='#["/schemaInfo"]'>
 			<http:body ><![CDATA[#[output application/json
 ---
 {
@@ -40,12 +40,12 @@ http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mul
 	dbSchemaInfo: vars.dbSchemaInfo
 }]]]></http:body>
 		</http:request>
-		<foreach doc:name="For Each" doc:id="651b1b15-715d-49b5-a7d5-2d140860b9df" collection="#[payload.fileList]">
-			<file:write doc:name="Write" doc:id="a66549ab-dd03-4af0-845a-97e8002df783" config-ref="File_Config_baseDir" path="#[write( p( 'filename.output.base' ) ++ &quot;/&quot; ++ vars.request.connection ++ &quot;/schemaInfo/&quot; ++ payload.outputFile, &quot;text/plain&quot; )]">
+		<foreach doc:name="For Each" doc:id="63565768-104a-4b2c-bfc0-3509d15cb61e" collection="#[payload.fileList]">
+			<file:write doc:name="Write" doc:id="836fc709-7464-444c-842c-890c6ed9f2cc" config-ref="File_Config_baseDir" path="#[write( p( 'filename.output.base' ) ++ &quot;/&quot; ++ vars.request.connection ++ &quot;/schemaInfo/&quot; ++ payload.outputFile, &quot;text/plain&quot; )]">
 				<file:content><![CDATA[#[write( payload.fileContent, "text/plain" )]]]></file:content>
 			</file:write>
 		</foreach>
-		<ee:transform doc:name="Prepare return tablesWithKeyColumnIssue" doc:id="8150187f-6207-47fc-9025-3cda5c5ae0d0">
+		<ee:transform doc:name="Prepare return tablesWithKeyColumnIssue" doc:id="1922286c-4ed8-436a-a547-2eea7ffed594">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -58,18 +58,18 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Log tablesWithKeyColumnIssue" doc:id="c469f886-50b5-4533-b7c1-3fc30f8a0d5b" message="#[payload]" />
+		<logger level="INFO" doc:name="Log tablesWithKeyColumnIssue" doc:id="e5a7c6e6-c8a0-4246-b163-f838f1a32fea" message="#[payload]" />
 	</flow>
 
-	<sub-flow name="getSchema.ex_mssql" doc:id="b4c51bf4-c0b9-4cbf-8840-fb6a7aa584d9">
-		<db:select doc:name="getFK" doc:id="525582d9-bd1b-44b1-b7d4-fb9bd62e0608" config-ref="Database_Config_EX_MsSql" target="fkInfo">
+	<sub-flow name="getSchema.ex_mssql" doc:id="b5de4b48-3d49-4189-88d9-90019c6816d1">
+		<db:select doc:name="getFK" doc:id="1d4d2998-118f-4c4d-bf27-208987b640af" config-ref="Database_Config_EX_MsSql" target="fkInfo">
 			<db:sql><![CDATA[#[ vars.request.fkQuery as String ]]]></db:sql>
 			<db:input-parameters><![CDATA[#[{
 	schemaName: vars.tablePointer.schemaName,
 	tableName: vars.tablePointer.tableName
 }]]]></db:input-parameters>
 		</db:select>
-		<db:select doc:name="getSchema" doc:id="1f166340-b00c-4c22-a5a1-58f737609d8f" config-ref="Database_Config_EX_MsSql">
+		<db:select doc:name="getSchema" doc:id="0ffd2f50-1846-493e-a64c-df48f1073584" config-ref="Database_Config_EX_MsSql">
 						<db:sql><![CDATA[#[ vars.request.schemaQuery as String ]]]></db:sql>
 						<db:input-parameters><![CDATA[#[{
 	schemaName: vars.tablePointer.schemaName,
@@ -78,15 +78,15 @@ output application/json
 					</db:select>
 
 </sub-flow>
-	<sub-flow name="getSchema.ex_mysql" doc:id="2dd22d19-7559-4080-90d3-6716fd2bf7c5" >
-		<db:select doc:name="getFK" doc:id="0d02b702-1d83-495e-98cc-01c7a018260f" config-ref="Database_Config_EX_MySql" target="fkInfo">
+	<sub-flow name="getSchema.ex_mysql" doc:id="3a81bb12-2367-4639-a835-412bdf0244cf" >
+		<db:select doc:name="getFK" doc:id="89f1d625-4789-4c4e-9fbb-d8c378eaa287" config-ref="Database_Config_EX_MySql" target="fkInfo">
 			<db:sql ><![CDATA[#[ vars.request.fkQuery as String ]]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{
 	schemaName: vars.tablePointer.schemaName,
 	tableName: vars.tablePointer.tableName
 }]]]></db:input-parameters>
 		</db:select>
-		<db:select doc:name="getSchema" doc:id="53da9eae-da85-4853-a5d9-9a02ecb22b12" config-ref="Database_Config_EX_MySql">
+		<db:select doc:name="getSchema" doc:id="d66fa771-9bc6-4df9-b025-c733eecfe6cd" config-ref="Database_Config_EX_MySql">
 						<db:sql><![CDATA[#[ vars.request.schemaQuery as String ]]]></db:sql>
 						<db:input-parameters><![CDATA[#[{
 	schemaName: vars.tablePointer.schemaName,
@@ -95,15 +95,15 @@ output application/json
 					</db:select>
 
 </sub-flow>
-	<sub-flow name="getSchema.ex_oracle" doc:id="6d2f8f8b-75df-4184-b98c-40ebcdffae8e" >
-		<db:select doc:name="getFK" doc:id="b7faacd5-08a6-4ee0-b7c0-ab3da17d163c" config-ref="Database_Config_EX_Oracle" target="fkInfo">
+	<sub-flow name="getSchema.ex_oracle" doc:id="d75e0325-9a60-4083-ad8a-3fe0f88309a1" >
+		<db:select doc:name="getFK" doc:id="b2047f5c-ff56-4575-adc0-8cac631adb78" config-ref="Database_Config_EX_Oracle" target="fkInfo">
 			<db:sql ><![CDATA[#[ vars.request.fkQuery as String ]]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{
 	schemaName: vars.tablePointer.schemaName,
 	tableName: vars.tablePointer.tableName
 }]]]></db:input-parameters>
 		</db:select>
-		<db:select doc:name="getSchema" doc:id="5c71e451-114e-4035-b836-cc12b68513a9" config-ref="Database_Config_EX_Postgres">
+		<db:select doc:name="getSchema" doc:id="dae2e07b-a32e-434c-bac0-f31d78c26072" config-ref="Database_Config_EX_Oracle">
 						<db:sql><![CDATA[#[ vars.request.schemaQuery as String ]]]></db:sql>
 						<db:input-parameters><![CDATA[#[{
 	schemaName: vars.tablePointer.schemaName,
@@ -112,16 +112,16 @@ output application/json
 					</db:select>
 	
 </sub-flow>
-	<sub-flow name="getSchema.ex_postgres" doc:id="1bd6e135-7dff-4904-8ad1-3fbf6a67f967" >
-		<db:select doc:name="getFK" doc:id="b1f07cea-701a-4fda-9131-c90242536dda" config-ref="Database_Config_EX_Postgres" target="fkInfo">
+	<sub-flow name="getSchema.ex_postgres" doc:id="00cbd145-bead-4637-a9f4-c7fb99c2e097" >
+		<db:select doc:name="getFK" doc:id="4b0034f3-e5b6-4f96-a00d-76c34e051e99" config-ref="Database_Config_EX_Postgres" target="fkInfo">
 			<db:sql ><![CDATA[#[ vars.request.fkQuery as String ]]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{
 	schemaName: vars.tablePointer.schemaName,
 	tableName: vars.tablePointer.tableName
 }]]]></db:input-parameters>
 		</db:select>
-		<set-variable value="#[vars.fkInfo map( e, i ) -&gt; do {&#10;	var fkRef = flatten( e.pg_get_constraintdef scan( /.*FOREIGN KEY\s*\((.*)\)\s*REFERENCES\s*(.*)\((.*)\)/ ) )[1 to -1]&#10;	---&#10;	{&#10;	  constraint_name: e.foreign_key,&#10;	  table_name: e.table_name as String,&#10;	  constraint_column_name: fkRef[ 0 ],&#10;	  referenced_object: fkRef[ 1 ],&#10;	  referenced_column_name: fkRef[ 2 ],&#10;	  entity_only: 'true'&#10;	}&#10;}]" doc:name="Set Variable" doc:id="594dd820-527d-4eb7-8b0f-08fe98d61e40" variableName="fkInfo"/>
-		<db:select doc:name="getSchema" doc:id="ae2017ec-1fd9-4b45-9aa9-264bdb81535a" config-ref="Database_Config_EX_Postgres">
+		<set-variable value="#[vars.fkInfo map( e, i ) -&gt; do {&#10;	var fkRef = flatten( e.pg_get_constraintdef scan( /.*FOREIGN KEY\s*\((.*)\)\s*REFERENCES\s*(.*)\((.*)\)/ ) )[1 to -1]&#10;	---&#10;	{&#10;	  constraint_name: e.foreign_key,&#10;	  table_name: e.table_name as String,&#10;	  constraint_column_name: fkRef[ 0 ],&#10;	  referenced_object: fkRef[ 1 ],&#10;	  referenced_column_name: fkRef[ 2 ],&#10;	  entity_only: 'true'&#10;	}&#10;}]" doc:name="Set Variable" doc:id="c5860165-a0f3-4bdd-bbba-304452f006ae" variableName="fkInfo"/>
+		<db:select doc:name="getSchema" doc:id="95edb084-433d-4090-8128-2db1013aaa27" config-ref="Database_Config_EX_Postgres">
 						<db:sql><![CDATA[#[ vars.request.schemaQuery as String ]]]></db:sql>
 						<db:input-parameters><![CDATA[#[{
 	schemaName: vars.tablePointer.schemaName,
