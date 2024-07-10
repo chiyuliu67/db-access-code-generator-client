@@ -84,7 +84,7 @@ schemaConnection:
         apiVersion: '1'
         projectName: 'test-ex_postgres-gql'
     dbtype: 'postgres'
-    schemaname: 'bookings'
+    schemaname: 'somePostgresSchemaname'
     tablenames: 'ticket_flights, boarding_passes, aircrafts_data, flights, airports_data, seats, tickets, bookings'
     host: 'local-vm-rocky'
     port: '5432'
