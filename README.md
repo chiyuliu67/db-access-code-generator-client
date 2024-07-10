@@ -24,7 +24,7 @@ The generated assets include the following:
 
 #### _OData_
 
-The current generated **_OData_** code supports **_"MsSql"_**, **_"Oracle"_**, **_"MySql"_**, and **_Postgres_** with the following **_REST_** operation:
+The current generated **_OData_** code supports **_"MsSql"_**, **_"Oracle"_**, **_"MySql"_**, and **_"Postgres"_** with the following **_REST_** operation:
 
 - **_GET COLLECTION_** (support **_\$top_**, **_\$skip_**, **_\$orderby_**, **_\$select_**, **_\$count_**, **_\$filter_**, **_\$expand_**, and **_nested \$expand_**)
 - **_POST COLLECTION_** (though it is accepting one record at a time, it is catagorized to COLLECTION because it doesn't take the ENTITY ID as the URI Param)
